@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f5c4d">
+<title>ختمة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fs:30px;--pri:#0f5c4d;--gold:#c9a24b;--bg:#f6f1e7;--card:#fffdf8;--txt:#1d2a26;--mut:#6b7a74;--line:#e4dccb}
+[data-theme=dark]{--bg:#12171a;--card:#1b2226;--txt:#e8ece9;--mut:#93a39c;--line:#2b363b;--pri:#1f8a6e}
+[data-theme=sepia]{--bg:#efe3c8;--card:#f6ecd5;--txt:#3b2f1b;--mut:#7d6b49;--line:#dccaa0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:Cairo,Tahoma,Arial,sans-serif;padding-bottom:84px;line-height:1.6}
+header{background:var(--pri);color:#fff;padding:14px 16px;text-align:center;font-size:20px;font-weight:700;letter-spacing:.5px}
+header small{display:block;font-weight:400;font-size:12px;opacity:.85}
+.view{display:none;max-width:720px;margin:0 auto;padding:14px}
+.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.center{text-align:center}
+h2{margin:0 0 6px;font-size:20px}
+.mut{color:var(--mut);font-size:14px}
+.hero{background:linear-gradient(135deg,var(--pri),#13795f);color:#fff;border:0;text-align:center}
+.hero .lbl{opacity:.85;font-size:14px}
+.hero .big{font-size:30px;font-weight:700;margin:6px 0}
+.hero .sub{opacity:.9;font-size:14px}
+.big{font-size:44px}
+.btn{display:block;width:100%;padding:13px;border:0;border-radius:14px;background:var(--pri);color:#fff;font:inherit;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn.gold{background:var(--gold);color:#2a2105}
+.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+.hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.5)}
+.btn.sm{width:auto;margin:0;padding:9px 14px;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{padding:9px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;cursor:pointer}
+.chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+input[type=number],input[type=time],input[type=text]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
+.bar{height:12px;background:var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--gold),var(--pri))}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat{background:var(--bg);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:12px;color:var(--mut)}
+.rbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0}
+.rbar .mid{text-align:center;flex:1;font-size:13px;color:var(--mut)}
+.rbar input{width:70px;display:inline-block;text-align:center;margin:0;padding:6px}
+.page{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;font-family:'Amiri Quran','Scheherazade New',serif;font-size:var(--fs);line-height:2.35;text-align:justify;min-height:300px}
+.page.loading{display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-size:16px;color:var(--mut)}
+.ayat{margin:0 0 6px}
+.sura{margin:14px 0 8px;padding:6px;text-align:center;border:2px solid var(--gold);border-radius:12px;color:var(--pri);font-size:calc(var(--fs) * .85);background:var(--bg)}
+.bism{text-align:center;margin-bottom:6px}
+.num{display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;height:1.5em;padding:0 .2em;border:1.5px solid var(--gold);border-radius:50%;font-family:Cairo,sans-serif;font-size:.5em;line-height:1;vertical-align:middle;color:var(--pri)}
+.pnav{display:flex;gap:10px;margin-top:12px}
+.pnav .btn{margin:0}
+.seg{display:flex;gap:8px;margin-bottom:10px}
+.seg button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;cursor:pointer}
+.seg button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:8px;cursor:pointer}
+.item .n{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.item .t{flex:1}
+.item .t small{display:block;color:var(--mut)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav button{flex:1;padding:9px 0 7px;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;cursor:pointer}
+nav button span{display:block;font-size:20px}
+nav button.on{color:var(--pri);font-weight:700}
+#toast{position:fixed;z-index:50;top:12px;left:12px;right:12px;max-width:600px;margin:0 auto;background:#222;color:#fff;border-radius:14px;padding:12px 16px;text-align:center;display:none}
+.note{font-size:13px;color:var(--mut);margin-top:8px}
+</style>
+</head>
+<body>
+<header>ختمة<small>رفيقك لختم القرآن الكريم</small></header>
+<div id="toast"></div>
+
+<section class="view" id="v-wird"></section>
+
+<section class="view" id="v-read">
+  <div class="rbar">
+    <button class="btn sm ghost" id="pv">السابقة</button>
+    <div class="mid"><input id="pgNo" type="number" min="1" max="604" inputmode="numeric"> <span id="pgTot"></span><div id="meta"></div></div>
+    <button class="btn sm" id="nx">التالية</button>
+  </div>
+  <div id="page" class="page"></div>
+  <div id="endcard"></div>
+  <div class="pnav"><button class="btn ghost" id="pv2">السابقة</button><button class="btn" id="nx2">التالية</button></div>
+</section>
+
+<section class="view" id="v-index"></section>
+<section class="view" id="v-set"></section>
+
+<nav>
+  <button data-v="wird"><span>🌙</span>الورد</button>
+  <button data-v="read"><span>📖</span>المصحف</button>
+  <button data-v="index"><span>📑</span>الفهرس</button>
+  <button data-v="set"><span>⚙️</span>الإعدادات</button>
+</nav>
+
+<script>
+const $ = id => document.getElementById(id);
+const AR = n => Number(n).toLocaleString('ar-EG');
+const TOTAL = 604;
+const JUZ = [1,22,42,62,82,102,121,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
+
+// ---------- التخزين ----------
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const DEF = { plan: null, done: 0, todayDate: '', todayStart: 0, todayDone: false, streak: 0, lastDate: '', khatmat: 0, last: 1, fs: 30, theme: 'light', remind: { on: false, time: '20:00' }, notifDate: '' };
+let st = Object.assign({}, DEF, LS.get('khatm_state', {}));
+st.remind = Object.assign({}, DEF.remind, st.remind || {});
+const save = () => LS.set('khatm_state', st);
+
+// ---------- التاريخ ----------
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const today = () => ymd(new Date());
+const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return ymd(d); };
+const pagesTxt = n => n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتان' : n <= 10 ? AR(n) + ' صفحات' : AR(n) + ' صفحة';
+
+// ---------- قاعدة البيانات المحلية (للقراءة بدون إنترنت) ----------
+let dbp = null;
+function db() {
+  if (dbp) return dbp;
+  dbp = new Promise((res, rej) => {
+    if (!window.indexedDB) { rej(new Error('no idb')); return; }
+    const q = indexedDB.open('khatm-quran', 1);
+    q.onupgradeneeded = () => q.result.createObjectStore('pages');
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+  return dbp;
+}
+async function idbGet(k) {
+  try { const d = await db(); return await new Promise(res => { const r = d.transaction('pages').objectStore('pages').get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(undefined); }); }
+  catch (e) { return undefined; }
+}
+async function idbSet(k, v) { try { const d = await db(); d.transaction('pages', 'readwrite').objectStore('pages').put(v, k); } catch (e) {} }
+async function idbCount() {
+  try { const d = await db(); return await new Promise(res => { const r = d.transaction('pages').objectStore('pages').count(); r.onsuccess = () => res(r.result); r.onerror = () => res(0); }); }
+  catch (e) { return 0; }
+}
+
+// ---------- جلب النص ----------
+const mem = new Map();
+async function getPage(n) {
+  if (mem.has(n)) return mem.get(n);
+  let p = await idbGet(n);
+  if (!p) {
+    const r = await fetch('https://api.alquran.cloud/v1/page/' + n + '/quran-uthmani');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (j.code !== 200 || !j.data || !Array.isArray(j.data.ayahs) || !j.data.ayahs.length) throw new Error('بيانات غير صالحة');
+    if (j.data.ayahs.some(a => a.page !== n)) throw new Error('صفحة غير مطابقة');
+    p = j.data.ayahs.map(a => [a.surah.number, a.surah.name, a.numberInSurah, a.text, a.juz]);
+    idbSet(n, p);
+  }
+  mem.set(n, p);
+  return p;
+}
+let BISM = null;
+async function getBism() {
+  if (BISM) return BISM;
+  const p = await getPage(1);
+  BISM = p[0][3];
+  return BISM;
+}
+async function getChapters() {
+  let c = LS.get('khatm_chapters', null);
+  if (c) return c;
+  const r = await fetch('https://api.quran.com/api/v4/chapters?language=ar');
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  c = j.chapters.map(x => ({ n: x.id, name: x.name_arabic, v: x.verses_count, p: x.pages[0], place: x.revelation_place }));
+  LS.set('khatm_chapters', c);
+  return c;
+}
+
+// ---------- أدوات ----------
+let toastT;
+function toast(t) { const e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => e.style.display = 'none', 5000); }
+function applyLook() {
+  document.documentElement.setAttribute('data-theme', st.theme);
+  document.documentElement.style.setProperty('--fs', st.fs + 'px');
+}
+function rollover() {
+  const t = today();
+  if (st.todayDate !== t) { st.todayDate = t; st.todayStart = st.done; st.todayDone = false; save(); }
+}
+const ppd = () => st.plan ? Math.ceil(TOTAL / st.plan.days) : 0;
+const wirdEnd = () => Math.min(TOTAL, st.todayStart + ppd());
+
+function markDone() {
+  rollover();
+  if (st.todayDone || !st.plan) return;
+  st.done = Math.max(st.done, wirdEnd());
+  st.todayDone = true;
+  const t = today();
+  if (st.lastDate !== t) { st.streak = (st.lastDate === yesterday()) ? st.streak + 1 : 1; st.lastDate = t; }
+  if (st.done >= TOTAL) st.khatmat++;
+  save();
+}
+function openPage(p) { st.last = p; save(); go('read'); }
+
+// ---------- التنقل ----------
+function go(v) {
+  document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === 'v-' + v));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  window.scrollTo(0, 0);
+  if (v === 'wird') renderWird();
+  if (v === 'read') renderPage(st.last);
+  if (v === 'index') renderIndex();
+  if (v === 'set') renderSettings();
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => go(b.dataset.v));
+
+// ---------- شاشة الورد ----------
+let selDays = 30;
+function chooserHTML() {
+  const opts = [30, 60, 90, 180, 365];
+  return '<div class="card"><h2>ابدأ ختمتك</h2><p class="mut">اختر عدد الأيام التي تريد أن تختم فيها القرآن، وسنحدد لك ورد كل يوم.</p>' +
+    '<div class="chips">' + opts.map(d => '<button class="chip' + (d === selDays ? ' on' : '') + '" data-d="' + d + '">' + AR(d) + ' يوماً</button>').join('') + '</div>' +
+    '<label class="mut">أو أدخل عدداً آخر من الأيام</label><input id="cd" type="number" min="1" max="3650" inputmode="numeric" value="' + selDays + '">' +
+    '<p class="mut" id="cp"></p><button class="btn" id="cs">ابدأ الختمة</button></div>';
+}
+function bindChooser() {
+  const upd = () => {
+    $('cp').textContent = 'ورد اليوم: ' + pagesTxt(Math.ceil(TOTAL / selDays));
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', +c.dataset.d === selDays));
+  };
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => { selDays = +c.dataset.d; $('cd').value = selDays; upd(); });
+  $('cd').oninput = () => { const v = parseInt($('cd').value, 10); selDays = isNaN(v) ? 30 : Math.min(3650, Math.max(1, v)); upd(); };
+  $('cs').onclick = () => { st.plan = { days: selDays }; rollover(); save(); renderWird(); };
+  upd();
+}
+function statsHTML() {
+  const pc = Math.floor(st.done / TOTAL * 100);
+  const sk = (st.lastDate === today() || st.lastDate === yesterday()) ? st.streak : 0;
+  let fin = '';
+  if (st.plan && st.done < TOTAL) {
+    const k = Math.ceil((TOTAL - st.done) / ppd());
+    const d = new Date(); d.setDate(d.getDate() + k - (st.todayDone ? 0 : 1));
+    fin = '<p class="mut">التاريخ المتوقع لإتمام الختمة: <b>' + d.toLocaleDateString('ar', { day: 'numeric', month: 'long', year: 'numeric' }) + '</b></p>';
+  }
+  return '<div class="card"><h2>تقدمك</h2><div class="bar"><div style="width:' + pc + '%"></div></div>' +
+    '<div class="mut">أتممت ' + AR(st.done) + ' من ' + AR(TOTAL) + ' صفحة (' + AR(pc) + '٪)</div>' + fin +
+    '<div class="grid"><div class="stat"><b>' + AR(TOTAL - st.done) + '</b><span>صفحة متبقية</span></div>' +
+    '<div class="stat"><b>🔥 ' + AR(sk) + '</b><span>أيام متتالية</span></div>' +
+    '<div class="stat"><b>' + AR(st.khatmat) + '</b><span>ختمات مكتملة</span></div>' +
+    '<div class="stat"><b>' + (st.plan ? AR(st.plan.days) : '-') + '</b><span>أيام الختمة</span></div></div></div>';
+}
+function renderWird() {
+  rollover();
+  const v = $('v-wird');
+  if (!st.plan) { v.innerHTML = chooserHTML(); bindChooser(); return; }
+  if (st.done >= TOTAL) {
+    v.innerHTML = '<div class="card center"><div class="big">🎉</div><h2>تقبّل الله ختمتك</h2><p class="mut">أتممت ختمة كاملة، بارك الله فيك وجعل القرآن ربيع قلبك.</p><button class="btn" id="nk">ابدأ ختمة جديدة</button></div>' + statsHTML();
+    $('nk').onclick = () => { st.done = 0; st.todayStart = 0; st.todayDone = false; save(); renderWird(); };
+    return;
+  }
+  const start = st.todayStart + 1, end = wirdEnd(), cnt = end - start + 1;
+  let h = '<div class="card hero"><div class="lbl">' + (st.todayDone ? 'أتممت ورد اليوم ✓' : 'ورد اليوم') + '</div>';
+  h += '<div class="big" style="font-size:30px">' + (start === end ? 'صفحة ' + AR(start) : 'من صفحة ' + AR(start) + ' إلى ' + AR(end)) + '</div>';
+  h += '<div class="sub">' + pagesTxt(cnt) + '<br><span id="wS"></span></div>';
+  h += '<button class="btn gold" id="wRead">' + (st.todayDone ? 'اقرأ ما تيسّر' : 'ابدأ القراءة') + '</button>';
+  if (!st.todayDone) h += '<button class="btn ghost" id="wDone">أتممت ورد اليوم ✓</button>';
+  h += '</div>';
+  if (st.todayDone) h += '<div class="card center"><p>بارك الله فيك. ورد الغد إن شاء الله يبدأ من صفحة ' + AR(Math.min(TOTAL, st.done + 1)) + '.</p></div>';
+  v.innerHTML = h + statsHTML();
+  $('wRead').onclick = () => openPage(st.todayDone ? Math.min(TOTAL, st.last) : start);
+  if ($('wDone')) $('wDone').onclick = () => { markDone(); renderWird(); };
+  getPage(start).then(p => { const e = $('wS'); if (e) e.textContent = 'تبدأ في ' + p[0][1]; }).catch(() => {});
+}
+
+// ---------- المصحف ----------
+let cur = 1;
+async function renderPage(n) {
+  n = Math.min(TOTAL, Math.max(1, parseInt(n, 10) || 1));
+  cur = n; st.last = n; save();
+  $('pgNo').value = n; $('pgTot').textContent = '/ ' + AR(TOTAL);
+  const box = $('page'); box.className = 'page loading'; box.textContent = 'جاري التحميل…';
+  $('endcard').innerHTML = '';
+  try {
+    const [ayahs, bism] = await Promise.all([getPage(n), getBism()]);
+    if (cur !== n) return;
+    box.className = 'page'; box.textContent = '';
+    let p = null;
+    const ensureP = () => { if (!p) { p = document.createElement('p'); p.className = 'ayat'; box.appendChild(p); } return p; };
+    ayahs.forEach(a => {
+      const sn = a[0], num = a[2];
+      let t = a[3];
+      if (num === 1) {
+        const h = document.createElement('div'); h.className = 'sura'; h.textContent = a[1]; box.appendChild(h);
+        if (sn !== 1 && sn !== 9) {
+          const b = document.createElement('div'); b.className = 'bism'; b.textContent = bism; box.appendChild(b);
+          if (t.startsWith(bism)) t = t.slice(bism.length).trim();
+        }
+        p = null;
+      }
+      const par = ensureP();
+      const s = document.createElement('span'); s.textContent = t + ' ';
+      const m = document.createElement('span'); m.className = 'num'; m.textContent = AR(num);
+      par.appendChild(s); par.appendChild(m); par.appendChild(document.createTextNode(' '));
+    });
+    $('meta').textContent = 'الجزء ' + AR(ayahs[0][4]) + ' • ' + ayahs[0][1].replace('سُورَةُ ', 'سورة ');
+    if (n < TOTAL) getPage(n + 1).catch(() => {});
+    if (st.plan && !st.todayDone && st.done < TOTAL && n >= wirdEnd() && n > st.todayStart) {
+      $('endcard').innerHTML = '<div class="card center"><p>وصلت إلى نهاية ورد اليوم. هل أتممته؟</p><button class="btn" id="ecb">نعم، أتممت الورد ✓</button></div>';
+      $('ecb').onclick = () => { markDone(); go('wird'); };
+    }
+  } catch (e) {
+    if (cur !== n) return;
+    box.className = 'page loading'; box.textContent = '';
+    const d = document.createElement('div'); d.className = 'center';
+    d.innerHTML = '<p>تعذر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</p><button class="btn sm" id="rt">إعادة المحاولة</button>';
+    box.appendChild(d); $('rt').onclick = () => renderPage(n);
+  }
+}
+$('pv').onclick = $('pv2').onclick = () => { if (cur > 1) { renderPage(cur - 1); window.scrollTo(0, 0); } };
+$('nx').onclick = $('nx2').onclick = () => { if (cur < TOTAL) { renderPage(cur + 1); window.scrollTo(0, 0); } };
+$('pgNo').onchange = () => renderPage($('pgNo').value);
+let tx = null;
+$('page').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+$('page').addEventListener('touchend', e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) < 70) return;
+  if (dx > 0 && cur < TOTAL) { renderPage(cur + 1); window.scrollTo(0, 0); }
+  if (dx < 0 && cur > 1) { renderPage(cur - 1); window.scrollTo(0, 0); }
+}, { passive: true });
+
+// ---------- الفهرس ----------
+let idxTab = 's';
+const norm = s => String(s).replace(/[\u064B-\u0652\u0670]/g, '').replace(/[إأآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+function addItem(parent, n, title, sub, page) {
+  const d = document.createElement('div'); d.className = 'item';
+  d.innerHTML = '<div class="n"></div><div class="t"><b></b><small></small></div><div class="mut"></div>';
+  d.children[0].textContent = AR(n);
+  d.querySelector('b').textContent = title;
+  d.querySelector('small').textContent = sub;
+  d.children[2].textContent = 'ص ' + AR(page);
+  d.onclick = () => openPage(page);
+  parent.appendChild(d);
+}
+async function renderIndex() {
+  const v = $('v-index');
+  v.innerHTML = '<div class="seg"><button data-t="s" class="' + (idxTab === 's' ? 'on' : '') + '">السور</button><button data-t="j" class="' + (idxTab === 'j' ? 'on' : '') + '">الأجزاء</button></div>' +
+    (idxTab === 's' ? '<input id="sf" type="text" placeholder="ابحث عن سورة…">' : '') + '<div id="il"></div>';
+  v.querySelectorAll('.seg button').forEach(b => b.onclick = () => { idxTab = b.dataset.t; renderIndex(); });
+  const il = $('il');
+  if (idxTab === 'j') { JUZ.forEach((p, i) => addItem(il, i + 1, 'الجزء ' + AR(i + 1), 'يبدأ من الصفحة ' + AR(p), p)); return; }
+  try {
+    const ch = await getChapters();
+    const draw = q => {
+      il.textContent = '';
+      const f = norm(q);
+      ch.filter(c => !f || norm(c.name).includes(f) || String(c.n) === f).forEach(c =>
+        addItem(il, c.n, 'سورة ' + c.name, (c.place === 'makkah' ? 'مكية' : 'مدنية') + ' • ' + AR(c.v) + ' آية', c.p));
+    };
+    draw('');
+    $('sf').oninput = () => draw($('sf').value.trim());
+  } catch (e) { il.innerHTML = '<div class="card center">يلزم اتصال بالإنترنت لتحميل الفهرس لأول مرة.</div>'; }
+}
+
+// ---------- التذكير ----------
+function checkRemind() {
+  rollover();
+  if (!st.remind.on || !st.plan || st.todayDone || st.done >= TOTAL) return;
+  const n = new Date();
+  const hm = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+  if (hm < st.remind.time || st.notifDate === today()) return;
+  st.notifDate = today(); save();
+  const msg = 'حان وقت ورد اليوم: ' + (wirdEnd() - st.todayStart === 1 ? 'صفحة ' + AR(st.todayStart + 1) : 'من صفحة ' + AR(st.todayStart + 1) + ' إلى ' + AR(wirdEnd()));
+  toast(msg);
+  try { if ('Notification' in window && Notification.permission === 'granted') new Notification('ختمة', { body: msg }); } catch (e) {}
+}
+setInterval(checkRemind, 20000);
+
+function downloadICS() {
+  const t = st.remind.time.split(':');
+  const d = new Date(); d.setHours(+t[0], +t[1], 0, 0);
+  const e = new Date(d.getTime() + 15 * 60000);
+  const f = x => x.getFullYear() + String(x.getMonth() + 1).padStart(2, '0') + String(x.getDate()).padStart(2, '0') + 'T' + String(x.getHours()).padStart(2, '0') + String(x.getMinutes()).padStart(2, '0') + '00';
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Khatm//AR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', 'UID:khatm-wird-daily@local', 'DTSTAMP:' + stamp,
+    'DTSTART:' + f(d), 'DTEND:' + f(e), 'RRULE:FREQ=DAILY', 'SUMMARY:ورد القرآن اليومي', 'DESCRIPTION:افتح تطبيق ختمة وأتمم ورد اليوم',
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:ورد القرآن اليومي', 'TRIGGER:PT0S', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  a.download = 'khatm-reminder.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+// ---------- الإعدادات ----------
+async function downloadAll() {
+  const btn = $('dl'); btn.disabled = true;
+  const todo = [];
+  for (let i = 1; i <= TOTAL; i++) { if (!(await idbGet(i))) todo.push(i); }
+  const total = todo.length; let n = 0, fail = 0;
+  const w = async () => {
+    while (todo.length) {
+      const i = todo.shift();
+      try { await getPage(i); } catch (e) { fail++; }
+      n++; $('dls').textContent = 'جاري التحميل: ' + AR(n) + ' / ' + AR(total);
+    }
+  };
+  await Promise.all([w(), w(), w(), w()]);
+  btn.disabled = false;
+  $('dls').textContent = fail ? 'تعذر تحميل ' + AR(fail) + ' صفحة، أعد المحاولة.' : 'تم تحميل المصحف كاملاً ✓';
+}
+async function renderSettings() {
+  const v = $('v-set');
+  const th = [['light', 'فاتح'], ['sepia', 'ورقي'], ['dark', 'ليلي']];
+  v.innerHTML =
+    '<div class="card"><h2>المظهر</h2><div class="chips">' + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
+    '<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="' + st.fs + '" style="width:100%"></div>' +
+    '<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ' + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
+    '<label class="mut">وقت التذكير</label><input id="rt" type="time" value="' + st.remind.time + '">' +
+    '<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>' +
+    '<p class="note">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>' +
+    '<div class="card"><h2>القراءة بدون إنترنت</h2><p class="mut" id="dls">جاري الفحص…</p><button class="btn" id="dl">تحميل المصحف كاملاً</button></div>' +
+    '<div class="card"><h2>الختمة</h2><button class="btn ghost" id="cp2">تغيير مدة الختمة</button><button class="btn ghost" id="rs">إعادة تعيين التقدم</button></div>' +
+    '<div class="card"><p class="note">النص القرآني برواية حفص عن عاصم بالرسم العثماني، يُجلب من واجهة alquran.cloud ويُعرض كما هو دون تعديل. ننصح دائماً بمراجعة المصحف المطبوع للتأكد.</p></div>';
+  v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
+  $('fs').oninput = () => { st.fs = +$('fs').value; save(); applyLook(); };
+  $('rm').onchange = async () => {
+    st.remind.on = $('rm').checked; save();
+    if (st.remind.on && 'Notification' in window && Notification.permission === 'default') { try { await Notification.requestPermission(); } catch (e) {} }
+  };
+  $('rt').onchange = () => { if ($('rt').value) { st.remind.time = $('rt').value; st.notifDate = ''; save(); } };
+  $('ics').onclick = downloadICS;
+  $('dl').onclick = downloadAll;
+  $('cp2').onclick = () => { st.plan = null; save(); go('wird'); };
+  $('rs').onclick = () => { if (confirm('سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟')) { st.done = 0; st.todayStart = 0; st.todayDone = false; st.streak = 0; st.lastDate = ''; save(); go('wird'); } };
+  const c = await idbCount();
+  if ($('dls')) $('dls').textContent = c >= TOTAL ? 'المصحف محمّل بالكامل ✓' : 'محمّل ' + AR(c) + ' من ' + AR(TOTAL) + ' صفحة';
+}
+
+// ---------- التشغيل ----------
+applyLook();
+rollover();
+go('wird');
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { rollover(); if ($('v-wird').classList.contains('on')) renderWird(); checkRemind(); } });
+</script>
+</body>
+</html>
