@@ -93,11 +93,11 @@ nav button{font-size:11px}
 a.btn{text-decoration:none;text-align:center}
 textarea{width:100%;min-height:220px;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-family:'Amiri Quran',serif;font-size:20px;line-height:2;margin-top:8px;direction:rtl}
 .lnk .acts{display:flex;gap:6px;flex:none}
-.txt{white-space:pre-wrap;text-align:right;font-family:'Amiri Quran',serif;font-size:var(--fs);line-height:2.2;max-height:60vh;overflow:auto}
+.txt{direction:rtl;white-space:pre-wrap;text-align:right;font-family:'Amiri Quran',serif;font-size:var(--fs);line-height:2.2;max-height:60vh;overflow:auto}
 </style>
 </head>
 <body>
-<header><img id="lg" alt="" style="width:34px;height:34px;border-radius:9px;vertical-align:middle;margin-left:8px">ختمة<small>رفيقك لختم القرآن الكريم</small></header>
+<header><img id="lg" alt="" style="width:34px;height:34px;border-radius:9px;vertical-align:middle;margin-left:8px"><span id="hT">ختمة</span><small id="hS">رفيقك لختم القرآن الكريم</small></header>
 <div id="toast"></div>
 <div id="modal"></div>
 
@@ -109,7 +109,7 @@ textarea{width:100%;min-height:220px;padding:11px;border-radius:12px;border:1px 
     <div class="mid"><input id="pgNo" type="number" min="1" max="604" inputmode="numeric"> <span id="pgTot"></span><div id="meta"></div></div>
     <button class="btn sm" id="nx">التالية</button>
   </div>
-  <div id="page" class="page"></div>
+  <div id="page" class="page" dir="rtl"></div>
   <div id="endcard"></div>
   <div class="pnav"><button class="btn ghost" id="pv2">السابقة</button><button class="btn" id="nx2">التالية</button></div>
 </section>
@@ -121,22 +121,23 @@ textarea{width:100%;min-height:220px;padding:11px;border-radius:12px;border:1px 
 <section class="view" id="v-duas"></section>
 
 <nav>
-  <button data-v="wird"><span>🌙</span>الورد</button>
-  <button data-v="read"><span>📖</span>المصحف</button>
-  <button data-v="index"><span>📑</span>الفهرس</button>
-  <button data-v="tsb"><span>📿</span>التسبيح</button>
-  <button data-v="duas"><span>🕌</span>الأدعية</button>
-  <button data-v="set"><span>⚙️</span>الإعدادات</button>
+  <button data-v="wird"><span>🌙</span><em data-k="الورد" style="font-style:normal">الورد</em></button>
+  <button data-v="read"><span>📖</span><em data-k="المصحف" style="font-style:normal">المصحف</em></button>
+  <button data-v="index"><span>📑</span><em data-k="الفهرس" style="font-style:normal">الفهرس</em></button>
+  <button data-v="tsb"><span>📿</span><em data-k="التسبيح" style="font-style:normal">التسبيح</em></button>
+  <button data-v="duas"><span>🕌</span><em data-k="الأدعية" style="font-style:normal">الأدعية</em></button>
+  <button data-v="set"><span>⚙️</span><em data-k="الإعدادات" style="font-style:normal">الإعدادات</em></button>
 </nav>
 
 <script>
 const $ = id => document.getElementById(id);
-const AR = n => Number(n).toLocaleString('ar-EG');
+const AR = n => Number(n).toLocaleString(st.lang === 'en' ? 'en-US' : 'ar-EG');
 const TOTAL = 604;
 const ICON = (document.querySelector('link[rel=icon]') || {}).href || '';
-const NUDGE = 'لا تدع الدنيا تلهيك، هيّا لنكمل قراءة القرآن 🌙';
+const NUDGE_AR = 'لا تدع الدنيا تلهيك، هيّا لنكمل قراءة القرآن 🌙';
+const NUDGE = () => (st.lang === 'en' ? EN[NUDGE_AR] : NUDGE_AR);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const nudge = () => (st.profile && st.profile.name ? st.profile.name + '، ' : '') + NUDGE;
+const nudge = () => (st.profile && st.profile.name ? st.profile.name + tl('، ') : '') + NUDGE();
 const JUZ = [1,22,42,62,82,102,121,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
 // ---------- التخزين ----------
@@ -144,7 +145,7 @@ const LS = {
   get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
-const DEF = { plan: null, done: 0, todayDate: '', todayStart: 0, todayDone: false, todayRead: 0, todayDeferred: false, streak: 0, lastDate: '', khatmat: 0, last: 1, fs: 30, theme: 'light', remind: { on: false, time: '20:00' }, notifDate: '', profile: null, tsb: { mode: 'free', i: 0, count: 0, target: 33, phase: 0, rounds: 0, day: '', today: 0, total: 0, custom: '' } };
+const DEF = { plan: null, done: 0, todayDate: '', todayStart: 0, todayDone: false, todayRead: 0, todayDeferred: false, streak: 0, lastDate: '', khatmat: 0, last: 1, fs: 30, theme: 'light', remind: { on: false, time: '20:00' }, notifDate: '', profile: null, lang: 'ar', tsb: { mode: 'free', i: 0, count: 0, target: 33, phase: 0, rounds: 0, day: '', today: 0, total: 0, custom: '' } };
 let st = Object.assign({}, DEF, LS.get('khatm_state', {}));
 st.remind = Object.assign({}, DEF.remind, st.remind || {});
 st.tsb = Object.assign({}, DEF.tsb, st.tsb || {});
@@ -155,7 +156,7 @@ const save = () => LS.set('khatm_state', st);
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const today = () => ymd(new Date());
 const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return ymd(d); };
-const pagesTxt = n => n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتان' : n <= 10 ? AR(n) + ' صفحات' : AR(n) + ' صفحة';
+const pagesTxt = n => n === 1 ? tl('صفحة واحدة') : n === 2 ? tl('صفحتان') : n <= 10 ? AR(n) + tl(' صفحات') : AR(n) + tl(' صفحة');
 
 // ---------- قاعدة البيانات المحلية (للقراءة بدون إنترنت) ----------
 let dbp = null;
@@ -189,8 +190,8 @@ async function getPage(n) {
     const r = await fetch('https://api.alquran.cloud/v1/page/' + n + '/quran-uthmani');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
-    if (j.code !== 200 || !j.data || !Array.isArray(j.data.ayahs) || !j.data.ayahs.length) throw new Error('بيانات غير صالحة');
-    if (j.data.ayahs.some(a => a.page !== n)) throw new Error('صفحة غير مطابقة');
+    if (j.code !== 200 || !j.data || !Array.isArray(j.data.ayahs) || !j.data.ayahs.length) throw new Error(tl('بيانات غير صالحة'));
+    if (j.data.ayahs.some(a => a.page !== n)) throw new Error(tl('صفحة غير مطابقة'));
     p = j.data.ayahs.map(a => [a.surah.number, a.surah.name, a.numberInSurah, a.text, a.juz]);
     idbSet(n, p);
   }
@@ -260,12 +261,12 @@ const hasPartial = () => !!(st.plan && !st.todayDone && st.done < TOTAL && st.to
 function askPartial() {
   const total = wirdEnd() - st.todayStart, got = st.todayRead - st.todayStart, rest = total - got;
   const m = $('modal');
-  m.innerHTML = '<div class="mbox"><h2>' + esc(nudge()) + '</h2><p>قرأت ' + pagesTxt(got) + ' من ' + pagesTxt(total) + '، وبقي ' + pagesTxt(rest) + '.<br>هل تريد إكمالها الآن أم تأجيلها إلى الغد؟</p>' +
-    '<p class="mut">إذا أجّلتها يُحتسب ما قرأته، ويبدأ ورد الغد من الصفحة التالية.</p>' +
-    '<button class="btn" id="mNow">إكمال الآن</button><button class="btn gold" id="mTom">إلى الغد</button><button class="btn ghost" id="mLater">ليس الآن</button></div>';
+  m.innerHTML = '<div class="mbox"><h2>' + esc(nudge()) + tl('</h2><p>قرأت ') + pagesTxt(got) + tl(' من ') + pagesTxt(total) + tl('، وبقي ') + pagesTxt(rest) + tl('.<br>هل تريد إكمالها الآن أم تأجيلها إلى الغد؟</p>') +
+    tl('<p class="mut">إذا أجّلتها يُحتسب ما قرأته، ويبدأ ورد الغد من الصفحة التالية.</p>') +
+    tl('<button class="btn" id="mNow">إكمال الآن</button><button class="btn gold" id="mTom">إلى الغد</button><button class="btn ghost" id="mLater">ليس الآن</button></div>');
   m.classList.add('on');
   $('mNow').onclick = () => { m.classList.remove('on'); openPage(st.todayRead + 1); };
-  $('mTom').onclick = () => { deferRest(); m.classList.remove('on'); go(curView); toast('بارك الله فيك، يبدأ ورد الغد من صفحة ' + AR(Math.min(TOTAL, st.done + 1))); };
+  $('mTom').onclick = () => { deferRest(); m.classList.remove('on'); go(curView); toast(tl('بارك الله فيك، يبدأ ورد الغد من صفحة ') + AR(Math.min(TOTAL, st.done + 1))); };
   $('mLater').onclick = () => m.classList.remove('on');
 }
 function openPage(p) { st.last = p; save(); go('read'); }
@@ -295,15 +296,15 @@ let selPages = 5;
 function chooserHTML() {
   const opts = [1, 2, 5, 10, 20];
   const first = st.done === 0;
-  return '<div class="card"><h2>' + (first ? 'ابدأ ختمتك' : 'عدد الصفحات اليومية') + '</h2><p class="mut">اختر كم صفحة تريد أن تقرأ كل يوم، وسنحسب لك مدة الختمة.</p>' +
+  return '<div class="card"><h2>' + (first ? tl('ابدأ ختمتك') : tl('عدد الصفحات اليومية')) + tl('</h2><p class="mut">اختر كم صفحة تريد أن تقرأ كل يوم، وسنحسب لك مدة الختمة.</p>') +
     '<div class="chips">' + opts.map(d => '<button class="chip' + (d === selPages ? ' on' : '') + '" data-d="' + d + '">' + pagesTxt(d) + '</button>').join('') + '</div>' +
-    '<label class="mut">أو أدخل عدداً آخر من الصفحات يومياً</label><input id="cd" type="number" min="1" max="604" inputmode="numeric" value="' + selPages + '">' +
-    '<p class="mut" id="cp"></p><button class="btn" id="cs">' + (first ? 'ابدأ الختمة' : 'حفظ') + '</button></div>';
+    tl('<label class="mut">أو أدخل عدداً آخر من الصفحات يومياً</label><input id="cd" type="number" min="1" max="604" inputmode="numeric" value="') + selPages + '">' +
+    '<p class="mut" id="cp"></p><button class="btn" id="cs">' + (first ? tl('ابدأ الختمة') : tl('حفظ')) + '</button></div>';
 }
 function bindChooser() {
   const upd = () => {
     const days = Math.ceil(Math.max(1, TOTAL - st.done) / selPages);
-    $('cp').textContent = 'تختم القرآن في ' + (days === 1 ? 'يوم واحد' : days === 2 ? 'يومين' : days <= 10 ? AR(days) + ' أيام' : AR(days) + ' يوماً') + ' تقريباً';
+    $('cp').textContent = tl('تختم القرآن في ') + (days === 1 ? tl('يوم واحد') : days === 2 ? tl('يومين') : days <= 10 ? AR(days) + tl(' أيام') : AR(days) + tl(' يوماً')) + tl(' تقريباً');
     document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', +c.dataset.d === selPages));
   };
   document.querySelectorAll('.chip').forEach(c => c.onclick = () => { selPages = +c.dataset.d; $('cd').value = selPages; upd(); });
@@ -318,40 +319,40 @@ function statsHTML() {
   if (st.plan && st.done < TOTAL) {
     const k = Math.ceil((TOTAL - st.done) / ppd());
     const d = new Date(); d.setDate(d.getDate() + k - (st.todayDone ? 0 : 1));
-    fin = '<p class="mut">التاريخ المتوقع لإتمام الختمة: <b>' + d.toLocaleDateString('ar', { day: 'numeric', month: 'long', year: 'numeric' }) + '</b></p>';
+    fin = tl('<p class="mut">التاريخ المتوقع لإتمام الختمة: <b>') + d.toLocaleDateString(st.lang === 'en' ? 'en-GB' : 'ar', { day: 'numeric', month: 'long', year: 'numeric' }) + '</b></p>';
   }
-  return '<div class="card"><h2>تقدمك</h2><div class="bar"><div style="width:' + pc + '%"></div></div>' +
-    '<div class="mut">أتممت ' + AR(st.done) + ' من ' + AR(TOTAL) + ' صفحة (' + AR(pc) + '٪)</div>' + fin +
-    '<div class="grid"><div class="stat"><b>' + AR(TOTAL - st.done) + '</b><span>صفحة متبقية</span></div>' +
-    '<div class="stat"><b>🔥 ' + AR(sk) + '</b><span>أيام متتالية</span></div>' +
-    '<div class="stat"><b>' + AR(st.khatmat) + '</b><span>ختمات مكتملة</span></div>' +
-    '<div class="stat"><b>' + (st.plan ? AR(ppd()) : '-') + '</b><span>صفحات يومياً</span></div></div></div>';
+  return tl('<div class="card"><h2>تقدمك</h2><div class="bar"><div style="width:') + pc + '%"></div></div>' +
+    tl('<div class="mut">أتممت ') + AR(st.done) + tl(' من ') + AR(TOTAL) + tl(' صفحة (') + AR(pc) + tl('٪)</div>') + fin +
+    '<div class="grid"><div class="stat"><b>' + AR(TOTAL - st.done) + tl('</b><span>صفحة متبقية</span></div>') +
+    '<div class="stat"><b>🔥 ' + AR(sk) + tl('</b><span>أيام متتالية</span></div>') +
+    '<div class="stat"><b>' + AR(st.khatmat) + tl('</b><span>ختمات مكتملة</span></div>') +
+    '<div class="stat"><b>' + (st.plan ? AR(ppd()) : '-') + tl('</b><span>صفحات يومياً</span></div></div></div>');
 }
 function renderWird() {
   rollover();
   const v = $('v-wird');
   if (!st.plan) { v.innerHTML = chooserHTML(); bindChooser(); return; }
   if (st.done >= TOTAL) {
-    v.innerHTML = '<div class="card center"><div class="big">🎉</div><h2>تقبّل الله ختمتك</h2><p class="mut">أتممت ختمة كاملة، بارك الله فيك وجعل القرآن ربيع قلبك.</p><button class="btn" id="nk">ابدأ ختمة جديدة</button></div>' + statsHTML();
+    v.innerHTML = tl('<div class="card center"><div class="big">🎉</div><h2>تقبّل الله ختمتك</h2><p class="mut">أتممت ختمة كاملة، بارك الله فيك وجعل القرآن ربيع قلبك.</p><button class="btn" id="nk">ابدأ ختمة جديدة</button></div>') + statsHTML();
     $('nk').onclick = () => { st.done = 0; st.todayStart = 0; st.todayRead = 0; st.todayDone = false; st.todayDeferred = false; save(); renderWird(); };
     return;
   }
   const start = st.todayStart + 1, end = wirdEnd(), cnt = end - start + 1;
-  let h = '<div class="card hero"><div class="lbl">' + (st.todayDone ? (st.todayDeferred ? 'أجّلت الباقي إلى الغد' : 'أتممت ورد اليوم ✓') : 'ورد اليوم') + '</div>';
-  h += '<div class="big" style="font-size:30px">' + (start === end ? 'صفحة ' + AR(start) : 'من صفحة ' + AR(start) + ' إلى ' + AR(end)) + '</div>';
-  h += '<div class="sub">' + pagesTxt(cnt) + (hasPartial() ? '<br>قرأت ' + pagesTxt(st.todayRead - st.todayStart) + '، وبقي ' + pagesTxt(end - st.todayRead) : '') + '<br><span id="wS"></span></div>';
-  h += '<button class="btn gold" id="wRead">' + (st.todayDone ? 'اقرأ ما تيسّر' : hasPartial() ? 'أكمل من صفحة ' + AR(st.todayRead + 1) : 'ابدأ القراءة') + '</button>';
-  if (!st.todayDone) h += '<button class="btn ghost" id="wDone">أتممت ورد اليوم ✓</button>';
+  let h = '<div class="card hero"><div class="lbl">' + (st.todayDone ? (st.todayDeferred ? tl('أجّلت الباقي إلى الغد') : tl('أتممت ورد اليوم ✓')) : tl('ورد اليوم')) + '</div>';
+  h += '<div class="big" style="font-size:30px">' + (start === end ? tl('صفحة ') + AR(start) : tl('من صفحة ') + AR(start) + tl(' إلى ') + AR(end)) + '</div>';
+  h += '<div class="sub">' + pagesTxt(cnt) + (hasPartial() ? tl('<br>قرأت ') + pagesTxt(st.todayRead - st.todayStart) + tl('، وبقي ') + pagesTxt(end - st.todayRead) : '') + '<br><span id="wS"></span></div>';
+  h += '<button class="btn gold" id="wRead">' + (st.todayDone ? tl('اقرأ ما تيسّر') : hasPartial() ? tl('أكمل من صفحة ') + AR(st.todayRead + 1) : tl('ابدأ القراءة')) + '</button>';
+  if (!st.todayDone) h += tl('<button class="btn ghost" id="wDone">أتممت ورد اليوم ✓</button>');
   h += '</div>';
-  if (st.todayDone) h += '<div class="card center"><p>بارك الله فيك. ورد الغد إن شاء الله يبدأ من صفحة ' + AR(Math.min(TOTAL, st.done + 1)) + '.</p></div>';
-  const greet = st.profile ? '<div class="mut" style="margin:0 4px 8px">أهلاً بك، <b>' + esc(st.profile.name) + '</b> 🌙</div>' : '';
+  if (st.todayDone) h += tl('<div class="card center"><p>بارك الله فيك. ورد الغد إن شاء الله يبدأ من صفحة ') + AR(Math.min(TOTAL, st.done + 1)) + '.</p></div>';
+  const greet = st.profile ? tl('<div class="mut" style="margin:0 4px 8px">أهلاً بك، <b>') + esc(st.profile.name) + '</b> 🌙</div>' : '';
   const tz = WEEK[new Date().getDay()];
-  const zi = '<div class="card"><h2>زيارة اليوم - ' + tz[0] + '</h2><p class="mut">' + esc(tz[1]) + '</p><button class="btn ghost" id="wZ">أعمال الأيام والزيارات</button></div>';
+  const zi = tl('<div class="card"><h2>زيارة اليوم - ') + tl(tz[0]) + '</h2><p class="mut">' + esc(tl(tz[1])) + tl('</p><button class="btn ghost" id="wZ">أعمال الأيام والزيارات</button></div>');
   v.innerHTML = greet + h + zi + statsHTML();
   $('wZ').onclick = () => { duasTab = 'week'; go('duas'); };
   $('wRead').onclick = () => openPage(st.todayDone ? Math.min(TOTAL, st.last) : Math.min(end, Math.max(start, st.todayRead + 1)));
   if ($('wDone')) $('wDone').onclick = () => { markDone(); renderWird(); };
-  getPage(start).then(p => { const e = $('wS'); if (e) e.textContent = 'تبدأ في ' + p[0][1]; }).catch(() => {});
+  getPage(start).then(p => { const e = $('wS'); if (e) e.textContent = tl('تبدأ في ') + p[0][1]; }).catch(() => {});
 }
 
 // ---------- المصحف ----------
@@ -360,7 +361,7 @@ async function renderPage(n) {
   n = Math.min(TOTAL, Math.max(1, parseInt(n, 10) || 1));
   cur = n; st.last = n; save();
   $('pgNo').value = n; $('pgTot').textContent = '/ ' + AR(TOTAL);
-  const box = $('page'); box.className = 'page loading'; box.textContent = 'جاري التحميل…';
+  const box = $('page'); box.className = 'page loading'; box.textContent = tl('جاري التحميل…');
   $('endcard').innerHTML = '';
   try {
     const [ayahs, bism] = await Promise.all([getPage(n), getBism()]);
@@ -384,18 +385,18 @@ async function renderPage(n) {
       const m = document.createElement('span'); m.className = 'num'; m.textContent = AR(num);
       par.appendChild(s); par.appendChild(m); par.appendChild(document.createTextNode(' '));
     });
-    $('meta').textContent = 'الجزء ' + AR(ayahs[0][4]) + ' • ' + ayahs[0][1].replace('سُورَةُ ', 'سورة ');
+    $('meta').textContent = tl('الجزء ') + AR(ayahs[0][4]) + ' • ' + ayahs[0][1].replace('سُورَةُ ', tl('سورة '));
     if (st.plan && !st.todayDone && n > st.todayStart && n <= wirdEnd() && n > st.todayRead) { st.todayRead = n; save(); }
     if (n < TOTAL) getPage(n + 1).catch(() => {});
     if (st.plan && !st.todayDone && st.done < TOTAL && n >= wirdEnd() && n > st.todayStart) {
-      $('endcard').innerHTML = '<div class="card center"><p>وصلت إلى نهاية ورد اليوم. هل أتممته؟</p><button class="btn" id="ecb">نعم، أتممت الورد ✓</button></div>';
+      $('endcard').innerHTML = tl('<div class="card center"><p>وصلت إلى نهاية ورد اليوم. هل أتممته؟</p><button class="btn" id="ecb">نعم، أتممت الورد ✓</button></div>');
       $('ecb').onclick = () => { markDone(); go('wird'); };
     }
   } catch (e) {
     if (cur !== n) return;
     box.className = 'page loading'; box.textContent = '';
     const d = document.createElement('div'); d.className = 'center';
-    d.innerHTML = '<p>تعذر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</p><button class="btn sm" id="rt">إعادة المحاولة</button>';
+    d.innerHTML = tl('<p>تعذر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</p><button class="btn sm" id="rt">إعادة المحاولة</button>');
     box.appendChild(d); $('rt').onclick = () => renderPage(n);
   }
 }
@@ -421,28 +422,28 @@ function addItem(parent, n, title, sub, page) {
   d.children[0].textContent = AR(n);
   d.querySelector('b').textContent = title;
   d.querySelector('small').textContent = sub;
-  d.children[2].textContent = 'ص ' + AR(page);
+  d.children[2].textContent = tl('ص ') + AR(page);
   d.onclick = () => openPage(page);
   parent.appendChild(d);
 }
 async function renderIndex() {
   const v = $('v-index');
-  v.innerHTML = '<div class="seg"><button data-t="s" class="' + (idxTab === 's' ? 'on' : '') + '">السور</button><button data-t="j" class="' + (idxTab === 'j' ? 'on' : '') + '">الأجزاء</button></div>' +
-    (idxTab === 's' ? '<input id="sf" type="text" placeholder="ابحث عن سورة…">' : '') + '<div id="il"></div>';
+  v.innerHTML = '<div class="seg"><button data-t="s" class="' + (idxTab === 's' ? 'on' : '') + tl('">السور</button><button data-t="j" class="') + (idxTab === 'j' ? 'on' : '') + tl('">الأجزاء</button></div>') +
+    (idxTab === 's' ? tl('<input id="sf" type="text" placeholder="ابحث عن سورة…">') : '') + '<div id="il"></div>';
   v.querySelectorAll('.seg button').forEach(b => b.onclick = () => { idxTab = b.dataset.t; renderIndex(); });
   const il = $('il');
-  if (idxTab === 'j') { JUZ.forEach((p, i) => addItem(il, i + 1, 'الجزء ' + AR(i + 1), 'يبدأ من الصفحة ' + AR(p), p)); return; }
+  if (idxTab === 'j') { JUZ.forEach((p, i) => addItem(il, i + 1, tl('الجزء ') + AR(i + 1), tl('يبدأ من الصفحة ') + AR(p), p)); return; }
   try {
     const ch = await getChapters();
     const draw = q => {
       il.textContent = '';
       const f = norm(q);
       ch.filter(c => !f || norm(c.name).includes(f) || String(c.n) === f).forEach(c =>
-        addItem(il, c.n, 'سورة ' + c.name, (c.place === 'makkah' ? 'مكية' : 'مدنية') + ' • ' + AR(c.v) + ' آية', c.p));
+        addItem(il, c.n, tl('سورة ') + c.name, (c.place === 'makkah' ? tl('مكية') : tl('مدنية')) + ' • ' + AR(c.v) + tl(' آية'), c.p));
     };
     draw('');
     $('sf').oninput = () => draw($('sf').value.trim());
-  } catch (e) { il.innerHTML = '<div class="card center">يلزم اتصال بالإنترنت لتحميل الفهرس لأول مرة.</div>'; }
+  } catch (e) { il.innerHTML = tl('<div class="card center">يلزم اتصال بالإنترنت لتحميل الفهرس لأول مرة.</div>'); }
 }
 
 // ---------- التذكير ----------
@@ -459,10 +460,10 @@ function checkRemind() {
 setInterval(checkRemind, 20000);
 function leftText() {
   const from = Math.max(st.todayStart, st.todayRead) + 1, to = wirdEnd();
-  return (st.todayRead > st.todayStart ? 'بقي من ورد اليوم: ' : 'ورد اليوم: ') + (from === to ? 'صفحة ' + AR(from) : 'من صفحة ' + AR(from) + ' إلى ' + AR(to));
+  return (st.todayRead > st.todayStart ? tl('بقي من ورد اليوم: ') : tl('ورد اليوم: ')) + (from === to ? tl('صفحة ') + AR(from) : tl('من صفحة ') + AR(from) + tl(' إلى ') + AR(to));
 }
 function notify(msg) {
-  try { if ('Notification' in window && Notification.permission === 'granted') new Notification('ختمة', { body: msg }); } catch (e) {}
+  try { if ('Notification' in window && Notification.permission === 'granted') new Notification(tl('ختمة'), { body: msg }); } catch (e) {}
 }
 
 function downloadICS() {
@@ -472,8 +473,8 @@ function downloadICS() {
   const f = x => x.getFullYear() + String(x.getMonth() + 1).padStart(2, '0') + String(x.getDate()).padStart(2, '0') + 'T' + String(x.getHours()).padStart(2, '0') + String(x.getMinutes()).padStart(2, '0') + '00';
   const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Khatm//AR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', 'UID:khatm-wird-daily@local', 'DTSTAMP:' + stamp,
-    'DTSTART:' + f(d), 'DTEND:' + f(e), 'RRULE:FREQ=DAILY', 'SUMMARY:ختمة - ورد القرآن اليومي', 'DESCRIPTION:' + NUDGE,
-    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + NUDGE, 'TRIGGER:PT0S', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    'DTSTART:' + f(d), 'DTEND:' + f(e), 'RRULE:FREQ=DAILY', tl('SUMMARY:ختمة - ورد القرآن اليومي'), 'DESCRIPTION:' + NUDGE(),
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + NUDGE(), 'TRIGGER:PT0S', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
   a.download = 'khatm-reminder.ics';
@@ -490,30 +491,31 @@ async function downloadAll() {
     while (todo.length) {
       const i = todo.shift();
       try { await getPage(i); } catch (e) { fail++; }
-      n++; $('dls').textContent = 'جاري التحميل: ' + AR(n) + ' / ' + AR(total);
+      n++; $('dls').textContent = tl('جاري التحميل: ') + AR(n) + ' / ' + AR(total);
     }
   };
   await Promise.all([w(), w(), w(), w()]);
   btn.disabled = false;
-  $('dls').textContent = fail ? 'تعذر تحميل ' + AR(fail) + ' صفحة، أعد المحاولة.' : 'تم تحميل المصحف كاملاً ✓';
+  $('dls').textContent = fail ? tl('تعذر تحميل ') + AR(fail) + tl(' صفحة، أعد المحاولة.') : tl('تم تحميل المصحف كاملاً ✓');
 }
 async function renderSettings() {
   const v = $('v-set');
-  const th = [['light', 'فاتح'], ['sepia', 'ورقي'], ['dark', 'ليلي']];
+  const th = [['light', tl('فاتح')], ['sepia', tl('ورقي')], ['dark', tl('ليلي')]];
   v.innerHTML =
-    '<div class="card"><h2>حسابي</h2><div id="pf"></div><button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button></div>' +
-    '<div class="card"><h2>المظهر</h2><div class="chips">' + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
-    '<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="' + st.fs + '" style="width:100%"></div>' +
-    '<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ' + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
-    '<label class="mut">وقت التذكير</label><input id="rt" type="time" value="' + st.remind.time + '">' +
-    '<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>' +
-    '<p class="note">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>' +
-    '<div class="card"><h2>القراءة بدون إنترنت</h2><p class="mut" id="dls">جاري الفحص…</p><button class="btn" id="dl">تحميل المصحف كاملاً</button></div>' +
-    '<div class="card"><h2>الختمة</h2><button class="btn ghost" id="cp2">تغيير عدد الصفحات اليومية</button><button class="btn ghost" id="rs">إعادة تعيين التقدم</button></div>' +
-    '<div class="card"><p class="note">النص القرآني برواية حفص عن عاصم بالرسم العثماني، يُجلب من واجهة alquran.cloud ويُعرض كما هو دون تعديل. ننصح دائماً بمراجعة المصحف المطبوع للتأكد.</p></div>';
+    tl('<div class="card"><h2>حسابي</h2><div id="pf"></div><button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button></div>') +
+    tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
+    tl('<div class="card"><h2>المظهر</h2><div class="chips">') + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
+    tl('<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="') + st.fs + '" style="width:100%"></div>' +
+    tl('<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ') + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
+    tl('<label class="mut">وقت التذكير</label><input id="rt" type="time" value="') + st.remind.time + '">' +
+    tl('<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>') +
+    tl('<p class="note">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>') +
+    tl('<div class="card"><h2>القراءة بدون إنترنت</h2><p class="mut" id="dls">جاري الفحص…</p><button class="btn" id="dl">تحميل المصحف كاملاً</button></div>') +
+    tl('<div class="card"><h2>الختمة</h2><button class="btn ghost" id="cp2">تغيير عدد الصفحات اليومية</button><button class="btn ghost" id="rs">إعادة تعيين التقدم</button></div>') +
+    tl('<div class="card"><p class="note">النص القرآني برواية حفص عن عاصم بالرسم العثماني، يُجلب من واجهة alquran.cloud ويُعرض كما هو دون تعديل. ننصح دائماً بمراجعة المصحف المطبوع للتأكد.</p></div>');
   if (st.profile) {
     const pr = st.profile, pf = $('pf');
-    [['الاسم', pr.name], ['العمر', AR(pr.age)], ['المحافظة', pr.gov + (pr.area ? ' - ' + pr.area : '')], ['الهاتف', pr.phone || '—'], ['البريد', pr.email || '—']].forEach(r => {
+    [[tl('الاسم'), pr.name], [tl('العمر'), AR(pr.age)], [tl('المحافظة'), tl(pr.gov) + (pr.area ? ' - ' + pr.area : '')], [tl('الهاتف'), pr.phone || '—'], [tl('البريد'), pr.email || '—']].forEach(r => {
       const d = document.createElement('div'); d.className = 'row';
       const a = document.createElement('span'); a.className = 'mut'; a.textContent = r[0];
       const b = document.createElement('b'); b.textContent = r[1];
@@ -521,7 +523,8 @@ async function renderSettings() {
     });
   }
   $('pe').onclick = () => { regEdit = true; go('reg'); };
-  $('pd').onclick = () => { if (confirm('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟')) { st.profile = null; save(); regEdit = false; go('reg'); } };
+  $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { st.profile = null; save(); regEdit = false; go('reg'); } };
+  v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
   $('fs').oninput = () => { st.fs = +$('fs').value; save(); applyLook(); };
   $('rm').onchange = async () => {
@@ -532,36 +535,37 @@ async function renderSettings() {
   $('ics').onclick = downloadICS;
   $('dl').onclick = downloadAll;
   $('cp2').onclick = () => { selPages = ppd() || 5; st.plan = null; save(); go('wird'); };
-  $('rs').onclick = () => { if (confirm('سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟')) { st.done = 0; st.todayStart = 0; st.todayRead = 0; st.todayDone = false; st.todayDeferred = false; st.streak = 0; st.lastDate = ''; save(); go('wird'); } };
+  $('rs').onclick = () => { if (confirm(tl('سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟'))) { st.done = 0; st.todayStart = 0; st.todayRead = 0; st.todayDone = false; st.todayDeferred = false; st.streak = 0; st.lastDate = ''; save(); go('wird'); } };
   const c = await idbCount();
-  if ($('dls')) $('dls').textContent = c >= TOTAL ? 'المصحف محمّل بالكامل ✓' : 'محمّل ' + AR(c) + ' من ' + AR(TOTAL) + ' صفحة';
+  if ($('dls')) $('dls').textContent = c >= TOTAL ? tl('المصحف محمّل بالكامل ✓') : tl('محمّل ') + AR(c) + tl(' من ') + AR(TOTAL) + tl(' صفحة');
 }
 
 // ---------- التسجيل ----------
 const GOVS = ['بغداد', 'البصرة', 'نينوى', 'أربيل', 'النجف', 'كربلاء', 'ذي قار', 'بابل', 'الأنبار', 'ديالى', 'كركوك', 'صلاح الدين', 'ميسان', 'واسط', 'المثنى', 'القادسية', 'دهوك', 'السليمانية', 'حلبجة', 'خارج العراق'];
 let regEdit = false;
 function validProfile(p) {
-  if (!p.name || p.name.trim().length < 2) return 'اكتب اسمك (حرفان على الأقل)';
+  if (!p.name || p.name.trim().length < 2) return tl('اكتب اسمك (حرفان على الأقل)');
   const a = Number(p.age);
-  if (!Number.isInteger(a) || a < 5 || a > 110) return 'اكتب عمراً صحيحاً';
-  if (!p.gov) return 'اختر المحافظة';
-  if (!/^\+?\d{10,15}$/.test(String(p.phone || '').replace(/[\s-]/g, ''))) return 'اكتب رقم هاتف صحيح (مثال: 07701234567)';
-  if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) return 'البريد الإلكتروني غير صحيح';
+  if (!Number.isInteger(a) || a < 5 || a > 110) return tl('اكتب عمراً صحيحاً');
+  if (!p.gov) return tl('اختر المحافظة');
+  if (!/^\+?\d{10,15}$/.test(String(p.phone || '').replace(/[\s-]/g, ''))) return tl('اكتب رقم هاتف صحيح (مثال: 07701234567)');
+  if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) return tl('البريد الإلكتروني غير صحيح');
   return '';
 }
 function renderReg() {
-  const v = $('v-reg'), p = st.profile || {};
-  v.innerHTML = '<div class="center"><img alt="" src="' + ICON + '" style="width:120px;height:120px;border-radius:26px;margin:6px 0 12px"></div><div class="card"><h2>' + (regEdit ? 'تعديل بياناتي' : 'أهلاً بك في ختمة') + '</h2>' +
-    '<p class="mut">' + (regEdit ? 'عدّل بياناتك ثم احفظ.' : 'سجّل بياناتك لنبدأ.') + ' تُحفظ على جهازك فقط ولا تُرسل لأي جهة.</p>' +
-    '<label class="mut">الاسم *</label><input id="rn" type="text" maxlength="40" autocomplete="name">' +
-    '<label class="mut">العمر *</label><input id="ra" type="number" min="5" max="110" inputmode="numeric">' +
-    '<label class="mut">المحافظة *</label><select id="rg"><option value="">اختر المحافظة</option>' + GOVS.map(g => '<option>' + g + '</option>').join('') + '</select>' +
-    '<label class="mut">المنطقة / الحي</label><input id="rz" type="text" maxlength="40">' +
-    '<label class="mut">رقم الهاتف (واتساب) *</label><input id="rp" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" placeholder="07701234567">' +
-    '<label class="mut">البريد الإلكتروني (اختياري)</label><input id="re" type="email" inputmode="email" autocomplete="email" maxlength="80" dir="ltr">' +
+  const v = $('v-reg'), p = Object.assign({}, st.profile || {}, regDraft || {}); regDraft = null;
+  v.innerHTML = '<div class="center"><img alt="" src="' + ICON + '" style="width:120px;height:120px;border-radius:26px;margin:6px 0 12px"></div>' + langRow() + '<div class="card"><h2>' + (regEdit ? tl('تعديل بياناتي') : tl('أهلاً بك في ختمة')) + '</h2>' +
+    '<p class="mut">' + (regEdit ? tl('عدّل بياناتك ثم احفظ.') : tl('سجّل بياناتك لنبدأ.')) + tl(' تُحفظ على جهازك فقط ولا تُرسل لأي جهة.</p>') +
+    tl('<label class="mut">الاسم *</label><input id="rn" type="text" maxlength="40" autocomplete="name">') +
+    tl('<label class="mut">العمر *</label><input id="ra" type="number" min="5" max="110" inputmode="numeric">') +
+    tl('<label class="mut">المحافظة *</label><select id="rg"><option value="">اختر المحافظة</option>') + GOVS.map(g => '<option value="' + g + '">' + tl(g) + '</option>').join('') + '</select>' +
+    tl('<label class="mut">المنطقة / الحي</label><input id="rz" type="text" maxlength="40">') +
+    tl('<label class="mut">رقم الهاتف (واتساب) *</label><input id="rp" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" placeholder="07701234567">') +
+    tl('<label class="mut">البريد الإلكتروني (اختياري)</label><input id="re" type="email" inputmode="email" autocomplete="email" maxlength="80" dir="ltr">') +
     '<p class="note" id="rerr" style="color:#c0392b"></p>' +
-    '<button class="btn" id="rsv">' + (regEdit ? 'حفظ' : 'ابدأ') + '</button>' + (regEdit ? '<button class="btn ghost" id="rcn">إلغاء</button>' : '') + '</div>';
+    '<button class="btn" id="rsv">' + (regEdit ? tl('حفظ') : tl('ابدأ')) + '</button>' + (regEdit ? tl('<button class="btn ghost" id="rcn">إلغاء</button>') : '') + '</div>';
   $('rn').value = p.name || ''; $('ra').value = p.age || ''; $('rg').value = p.gov || ''; $('rz').value = p.area || ''; $('rp').value = p.phone || ''; $('re').value = p.email || '';
+  v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   $('rsv').onclick = () => {
     const np = { name: $('rn').value.trim(), age: $('ra').value.trim(), gov: $('rg').value, area: $('rz').value.trim(), phone: $('rp').value.trim(), email: $('re').value.trim() };
     const err = validProfile(np);
@@ -584,7 +588,7 @@ const buzz = x => { try { if (navigator.vibrate) navigator.vibrate(x); } catch (
 function tsbCur() {
   const t = st.tsb;
   if (t.mode === 'zahra') return { text: ZAHRA[t.phase][0], target: ZAHRA[t.phase][1] };
-  if (t.i === -1) return { text: t.custom || 'ذكر مخصص', target: t.target };
+  if (t.i === -1) return { text: t.custom || tl('ذكر مخصص'), target: t.target };
   return { text: ADHKAR[t.i][0], target: t.target };
 }
 function tsbTap() {
@@ -596,9 +600,9 @@ function tsbTap() {
   if (c.target > 0 && t.count >= c.target) {
     buzz([40, 60, 40]);
     if (t.mode === 'zahra') {
-      if (t.phase < 2) { t.phase++; t.count = 0; toast('انتقل إلى: ' + ZAHRA[t.phase][0]); }
-      else { t.phase = 0; t.count = 0; t.rounds++; toast('تقبّل الله، أتممت تسبيح الزهراء (ع) 🤍'); }
-    } else { t.count = 0; t.rounds++; toast('أتممت ' + AR(c.target) + ' ✓'); }
+      if (t.phase < 2) { t.phase++; t.count = 0; toast(tl('انتقل إلى: ') + ZAHRA[t.phase][0]); }
+      else { t.phase = 0; t.count = 0; t.rounds++; toast(tl('تقبّل الله، أتممت تسبيح الزهراء (ع) 🤍')); }
+    } else { t.count = 0; t.rounds++; toast(tl('أتممت ') + AR(c.target) + ' ✓'); }
   }
   save(); tsbUpdate();
 }
@@ -606,36 +610,36 @@ function tsbUpdate() {
   if (!$('tsbN')) return;
   const t = st.tsb, c = tsbCur();
   $('tsbN').textContent = AR(t.count);
-  $('tsbT').textContent = c.target > 0 ? 'من ' + AR(c.target) : 'بدون حد';
-  $('tsbD').textContent = c.text;
+  $('tsbT').textContent = c.target > 0 ? tl('من ') + AR(c.target) : tl('بدون حد');
+  $('tsbD').textContent = dk(c.text);
   $('tsbR').style.setProperty('--p', c.target > 0 ? Math.min(100, t.count / c.target * 100) : 0);
-  $('tsbS').textContent = 'اليوم: ' + AR(t.day === today() ? t.today : 0) + '  •  الدورات: ' + AR(t.rounds) + '  •  المجموع: ' + AR(t.total);
+  $('tsbS').textContent = tl('اليوم: ') + AR(t.day === today() ? t.today : 0) + tl('  •  الدورات: ') + AR(t.rounds) + tl('  •  المجموع: ') + AR(t.total);
 }
 function renderTasbih() {
   const t = st.tsb, v = $('v-tsb');
-  v.innerHTML = '<div class="seg"><button data-m="free" class="' + (t.mode === 'free' ? 'on' : '') + '">تسبيح حر</button><button data-m="zahra" class="' + (t.mode === 'zahra' ? 'on' : '') + '">تسبيح الزهراء (ع)</button></div>' +
+  v.innerHTML = '<div class="seg"><button data-m="free" class="' + (t.mode === 'free' ? 'on' : '') + tl('">تسبيح حر</button><button data-m="zahra" class="') + (t.mode === 'zahra' ? 'on' : '') + tl('">تسبيح الزهراء (ع)</button></div>') +
     '<div class="card center"><div class="dhikr" id="tsbD"></div>' +
-    '<div class="ring" id="tsbR"><button class="tsb" id="tsbB"><span id="tsbN">٠</span><small id="tsbT"></small></button></div>' +
-    '<div class="row" style="justify-content:center"><button class="btn sm ghost" id="tsbU">تراجع</button><button class="btn sm ghost" id="tsbZ">تصفير</button></div>' +
+    tl('<div class="ring" id="tsbR"><button class="tsb" id="tsbB"><span id="tsbN">٠</span><small id="tsbT"></small></button></div>') +
+    tl('<div class="row" style="justify-content:center"><button class="btn sm ghost" id="tsbU">تراجع</button><button class="btn sm ghost" id="tsbZ">تصفير</button></div>') +
     '<p class="mut" id="tsbS"></p></div>' +
     (t.mode === 'free'
-      ? '<div class="card"><h2>الأذكار</h2><div class="scrollx" id="adk"></div>' +
-        '<label class="mut">الهدف (عدد التسبيحات)</label><div class="scrollx" id="tgt"></div>' +
-        '<input id="tgi" type="number" min="0" max="100000" inputmode="numeric" placeholder="أو اكتب عدداً آخر (٠ = بدون حد)">' +
-        '<label class="mut">أو اكتب ذكرك الخاص</label><input id="cus" type="text" maxlength="60" placeholder="اكتب الذكر هنا"></div>'
-      : '<div class="card"><p class="note">تسبيح الزهراء (ع): الله أكبر ٣٤، ثم الحمد لله ٣٣، ثم سبحان الله ٣٣. ينتقل العداد تلقائياً من ذكر لآخر.</p></div>');
+      ? tl('<div class="card"><h2>الأذكار</h2><div class="scrollx" id="adk"></div>') +
+        tl('<label class="mut">الهدف (عدد التسبيحات)</label><div class="scrollx" id="tgt"></div>') +
+        tl('<input id="tgi" type="number" min="0" max="100000" inputmode="numeric" placeholder="أو اكتب عدداً آخر (٠ = بدون حد)">') +
+        tl('<label class="mut">أو اكتب ذكرك الخاص</label><input id="cus" type="text" maxlength="60" placeholder="اكتب الذكر هنا"></div>')
+      : tl('<div class="card"><p class="note">تسبيح الزهراء (ع): الله أكبر ٣٤، ثم الحمد لله ٣٣، ثم سبحان الله ٣٣. ينتقل العداد تلقائياً من ذكر لآخر.</p></div>'));
   v.querySelectorAll('.seg button').forEach(b => b.onclick = () => { t.mode = b.dataset.m; t.count = 0; t.phase = 0; save(); renderTasbih(); });
   $('tsbB').onclick = tsbTap;
   $('tsbU').onclick = () => { if (t.count > 0) { t.count--; if (t.day === today() && t.today > 0) t.today--; if (t.total > 0) t.total--; save(); tsbUpdate(); } };
   $('tsbZ').onclick = () => { t.count = 0; t.phase = 0; save(); tsbUpdate(); };
   if (t.mode === 'free') {
     ADHKAR.forEach((a, i) => {
-      const b = document.createElement('button'); b.className = 'chip' + (t.i === i ? ' on' : ''); b.textContent = a[0];
+      const b = document.createElement('button'); b.className = 'chip' + (t.i === i ? ' on' : ''); b.textContent = dk(a[0]);
       b.onclick = () => { t.i = i; t.target = a[1]; t.count = 0; save(); renderTasbih(); };
       $('adk').appendChild(b);
     });
     [33, 34, 100, 500, 1000, 0].forEach(n => {
-      const b = document.createElement('button'); b.className = 'chip' + (t.target === n ? ' on' : ''); b.textContent = n ? AR(n) : 'بدون حد';
+      const b = document.createElement('button'); b.className = 'chip' + (t.target === n ? ' on' : ''); b.textContent = n ? AR(n) : tl('بدون حد');
       b.onclick = () => { t.target = n; t.count = 0; save(); renderTasbih(); };
       $('tgt').appendChild(b);
     });
@@ -701,69 +705,100 @@ const LOADERS = {
       if (j.code !== 200 || !j.data || j.data.surah.number !== 43 || j.data.numberInSurah !== n) throw new Error('bad');
       out.push('﴿ ' + j.data.text + ' ﴾');
     }
-    return out.join('\n') + '\n(سورة الزخرف، الآيتان ' + AR(13) + ' و' + AR(14) + ')، وتُقرأ عند الانطلاق في السفر.';
+    return out.join('\n') + tl('\n(سورة الزخرف، الآيتان ') + AR(13) + tl(' و') + AR(14) + tl(')، وتُقرأ عند الانطلاق في السفر.');
   }
 };
 async function showText(title) {
   const m = $('modal');
-  m.innerHTML = '<div class="mbox"><h2></h2><div class="txt" id="mtx">جاري التحميل…</div><button class="btn" id="mcl">إغلاق</button></div>';
-  m.querySelector('h2').textContent = title;
+  m.innerHTML = tl('<div class="mbox"><h2></h2><div class="txt" id="mtx">جاري التحميل…</div><button class="btn" id="mcl">إغلاق</button></div>');
+  m.querySelector('h2').textContent = LT(title);
   m.classList.add('on');
   $('mcl').onclick = () => m.classList.remove('on');
   let head = '';
-  if (LOADERS[title]) { try { head = await LOADERS[title](); } catch (e) { head = 'تعذر تحميل الآيات، تأكد من الاتصال بالإنترنت.'; } }
+  if (LOADERS[title]) { try { head = await LOADERS[title](); } catch (e) { head = tl('تعذر تحميل الآيات، تأكد من الاتصال بالإنترنت.'); } }
   if (!$('mtx')) return;
   $('mtx').textContent = [head, getText(title)].filter(Boolean).join('\n\n');
   if (!TEXTS[title]) {
-    const e = document.createElement('button'); e.className = 'btn ghost'; e.textContent = getText(title) ? 'تعديل النص المحفوظ' : 'إضافة نص';
+    const e = document.createElement('button'); e.className = 'btn ghost'; e.textContent = getText(title) ? tl('تعديل النص المحفوظ') : tl('إضافة نص');
     e.onclick = () => editText(title);
     m.querySelector('.mbox').insertBefore(e, $('mcl'));
   }
 }
 function editText(title) {
   const m = $('modal');
-  m.innerHTML = '<div class="mbox"><h2></h2><p class="mut">انسخ النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به) والصقه هنا. يُحفظ على جهازك فقط ويظهر داخل التطبيق.</p><textarea id="mta" dir="rtl"></textarea><button class="btn" id="msv">حفظ</button><button class="btn ghost" id="mcn">إلغاء</button></div>';
-  m.querySelector('h2').textContent = title;
+  m.innerHTML = tl('<div class="mbox"><h2></h2><p class="mut">انسخ النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به) والصقه هنا. يُحفظ على جهازك فقط ويظهر داخل التطبيق.</p><textarea id="mta" dir="rtl"></textarea><button class="btn" id="msv">حفظ</button><button class="btn ghost" id="mcn">إلغاء</button></div>');
+  m.querySelector('h2').textContent = LT(title);
   $('mta').value = UT.get()[title] || '';
   m.classList.add('on');
   $('mcn').onclick = () => m.classList.remove('on');
   $('msv').onclick = () => {
     const o = UT.get(), v = $('mta').value.trim();
     if (v) o[title] = v; else delete o[title];
-    UT.set(o); m.classList.remove('on'); renderDuas(); toast(v ? 'تم حفظ النص ✓' : 'تم حذف النص');
+    UT.set(o); m.classList.remove('on'); renderDuas(); toast(v ? tl('تم حفظ النص ✓') : tl('تم حذف النص'));
   };
 }
 function lnk(parent, title, sub, q, isToday) {
   const d = document.createElement('div'); d.className = 'lnk' + (isToday ? ' today' : '');
   d.innerHTML = '<div class="t"><b></b><small></small></div><div class="acts"></div>';
-  d.querySelector('b').textContent = title; d.querySelector('small').textContent = sub || '';
+  d.querySelector('b').textContent = LT(title); d.querySelector('small').textContent = tl(sub || '');
   const acts = d.querySelector('.acts');
   const mkb = (t, cls, fn) => { const b = document.createElement('button'); b.className = 'btn sm ' + cls; b.textContent = t; b.onclick = fn; acts.appendChild(b); };
-  if (getText(title) || LOADERS[title]) mkb('اقرأ', '', () => showText(title));
+  if (getText(title) || LOADERS[title]) mkb(tl('اقرأ'), '', () => showText(title));
   else {
-    mkb('ألصق النص', '', () => editText(title));
-    const a = document.createElement('a'); a.className = 'btn sm ghost'; a.textContent = 'بحث'; a.href = gq(q); a.target = '_blank'; a.rel = 'noopener noreferrer'; acts.appendChild(a);
+    mkb(tl('ألصق النص'), '', () => editText(title));
+    const a = document.createElement('a'); a.className = 'btn sm ghost'; a.textContent = tl('بحث'); a.href = gq(q); a.target = '_blank'; a.rel = 'noopener noreferrer'; acts.appendChild(a);
   }
   parent.appendChild(d);
 }
 function renderDuas() {
   const v = $('v-duas');
   v.innerHTML = '<div class="scrollx" id="dtabs"></div><div id="dl2"></div><p class="note" id="dnote"></p>';
-  [['duas', 'مفاتيح الجنان'], ['imams', 'زيارات الأئمة'], ['week', 'أيام الأسبوع'], ['gen', 'الزيارات العامة']].forEach(x => {
+  [['duas', tl('مفاتيح الجنان')], ['imams', tl('زيارات الأئمة')], ['week', tl('أيام الأسبوع')], ['gen', tl('الزيارات العامة')]].forEach(x => {
     const b = document.createElement('button'); b.className = 'chip' + (duasTab === x[0] ? ' on' : ''); b.textContent = x[1];
     b.onclick = () => { duasTab = x[0]; renderDuas(); };
     $('dtabs').appendChild(b);
   });
   const L = $('dl2');
   if (duasTab === 'duas') DUAS.forEach(d => lnk(L, d[0], d[1], d[0] + ' مفاتيح الجنان'));
-  if (duasTab === 'imams') IMAMS.forEach(m => lnk(L, 'زيارة ' + m[0], m[1] ? 'المرقد: ' + m[1] : '', 'زيارة ' + m[0].replace(/\s*\(.*?\)/g, '') + ' مفاتيح الجنان'));
+  if (duasTab === 'imams') IMAMS.forEach(m => lnk(L, 'زيارة ' + m[0], m[1] ? tl('المرقد: ') + tl(m[1]) : '', 'زيارة ' + m[0].replace(/\s*\(.*?\)/g, '') + ' مفاتيح الجنان'));
   if (duasTab === 'week') { const td = new Date().getDay(); [6, 0, 1, 2, 3, 4, 5].forEach(i => lnk(L, 'يوم ' + WEEK[i][0], WEEK[i][1], 'زيارة ' + WEEK[i][1].replace(/\s*\(.*?\)/g, '') + ' يوم ' + WEEK[i][0] + ' مفاتيح الجنان', i === td)); }
   if (duasTab === 'gen') ZIY.forEach(z => lnk(L, z[0], z[1], z[0] + ' مفاتيح الجنان'));
-  $('dnote').textContent = 'هذا القسم فهرس لأدعية وزيارات مفاتيح الجنان وأوقاتها. لم أكتب النصوص من عندي حرصاً على سلامتها من الخطأ. اضغط «ألصق النص» وألصق النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به)، فيُحفظ على جهازك ويظهر بعدها داخل التطبيق بزر «اقرأ». زر «بحث» يساعدك تلقى النص. دعاء السفر يبدأ بآيتين قرآنيتين تُجلبان من واجهة القرآن مباشرة.';
+  $('dnote').textContent = tl('هذا القسم فهرس لأدعية وزيارات مفاتيح الجنان وأوقاتها. لم أكتب النصوص من عندي حرصاً على سلامتها من الخطأ. اضغط «ألصق النص» وألصق النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به)، فيُحفظ على جهازك ويظهر بعدها داخل التطبيق بزر «اقرأ». زر «بحث» يساعدك تلقى النص. دعاء السفر يبدأ بآيتين قرآنيتين تُجلبان من واجهة القرآن مباشرة.');
+}
+
+
+// ---------- اللغة / Language ----------
+const EN = {"لا تدع الدنيا تلهيك، هيّا لنكمل قراءة القرآن 🌙": "Don't let the world distract you, let's continue reading the Quran 🌙", "، ": ", ", "صفحة واحدة": "1 page", "صفحتان": "2 pages", " صفحات": " pages", " صفحة": " pages", "بيانات غير صالحة": "Invalid data", "صفحة غير مطابقة": "Page mismatch", "</h2><p>قرأت ": "</h2><p>You read ", " من ": " of ", "، وبقي ": ", remaining: ", ".<br>هل تريد إكمالها الآن أم تأجيلها إلى الغد؟</p>": ".<br>Do you want to finish them now or postpone to tomorrow?</p>", "<p class=\"mut\">إذا أجّلتها يُحتسب ما قرأته، ويبدأ ورد الغد من الصفحة التالية.</p>": "<p class=\"mut\">If you postpone, what you read is counted, and tomorrow's reading starts from the next page.</p>", "<button class=\"btn\" id=\"mNow\">إكمال الآن</button><button class=\"btn gold\" id=\"mTom\">إلى الغد</button><button class=\"btn ghost\" id=\"mLater\">ليس الآن</button></div>": "<button class=\"btn\" id=\"mNow\">Finish now</button><button class=\"btn gold\" id=\"mTom\">Until tomorrow</button><button class=\"btn ghost\" id=\"mLater\">Not now</button></div>", "بارك الله فيك، يبدأ ورد الغد من صفحة ": "God bless you. Tomorrow's reading starts at page ", "ابدأ ختمتك": "Start your Khatma", "عدد الصفحات اليومية": "Pages per day", "</h2><p class=\"mut\">اختر كم صفحة تريد أن تقرأ كل يوم، وسنحسب لك مدة الختمة.</p>": "</h2><p class=\"mut\">Choose how many pages you want to read each day, and we will calculate how long the Khatma will take.</p>", "<label class=\"mut\">أو أدخل عدداً آخر من الصفحات يومياً</label><input id=\"cd\" type=\"number\" min=\"1\" max=\"604\" inputmode=\"numeric\" value=\"": "<label class=\"mut\">Or enter another number of pages per day</label><input id=\"cd\" type=\"number\" min=\"1\" max=\"604\" inputmode=\"numeric\" value=\"", "ابدأ الختمة": "Start the Khatma", "حفظ": "Save", "تختم القرآن في ": "You will finish the Quran in ", "يوم واحد": "1 day", "يومين": "2 days", " أيام": " days", " يوماً": " days", " تقريباً": " (approx.)", "<p class=\"mut\">التاريخ المتوقع لإتمام الختمة: <b>": "<p class=\"mut\">Expected completion date: <b>", "<div class=\"card\"><h2>تقدمك</h2><div class=\"bar\"><div style=\"width:": "<div class=\"card\"><h2>Your progress</h2><div class=\"bar\"><div style=\"width:", "<div class=\"mut\">أتممت ": "<div class=\"mut\">Completed ", " صفحة (": " pages (", "٪)</div>": "%)</div>", "</b><span>صفحة متبقية</span></div>": "</b><span>pages left</span></div>", "</b><span>أيام متتالية</span></div>": "</b><span>day streak</span></div>", "</b><span>ختمات مكتملة</span></div>": "</b><span>Khatmas completed</span></div>", "</b><span>صفحات يومياً</span></div></div></div>": "</b><span>pages per day</span></div></div></div>", "<div class=\"card center\"><div class=\"big\">🎉</div><h2>تقبّل الله ختمتك</h2><p class=\"mut\">أتممت ختمة كاملة، بارك الله فيك وجعل القرآن ربيع قلبك.</p><button class=\"btn\" id=\"nk\">ابدأ ختمة جديدة</button></div>": "<div class=\"card center\"><div class=\"big\">🎉</div><h2>May God accept your Khatma</h2><p class=\"mut\">You have completed a full Khatma. May God bless you and make the Quran the spring of your heart.</p><button class=\"btn\" id=\"nk\">Start a new Khatma</button></div>", "أجّلت الباقي إلى الغد": "You postponed the rest to tomorrow", "أتممت ورد اليوم ✓": "Today's reading completed ✓", "ورد اليوم": "Today's reading", "صفحة ": "Page ", "من صفحة ": "From page ", " إلى ": " to ", "<br>قرأت ": "<br>You read ", "اقرأ ما تيسّر": "Read what you can", "أكمل من صفحة ": "Continue from page ", "ابدأ القراءة": "Start reading", "<button class=\"btn ghost\" id=\"wDone\">أتممت ورد اليوم ✓</button>": "<button class=\"btn ghost\" id=\"wDone\">I finished today's reading ✓</button>", "<div class=\"card center\"><p>بارك الله فيك. ورد الغد إن شاء الله يبدأ من صفحة ": "<div class=\"card center\"><p>God bless you. Tomorrow's reading will start from page ", "<div class=\"mut\" style=\"margin:0 4px 8px\">أهلاً بك، <b>": "<div class=\"mut\" style=\"margin:0 4px 8px\">Welcome, <b>", "<div class=\"card\"><h2>زيارة اليوم - ": "<div class=\"card\"><h2>Today's ziyarat - ", "</p><button class=\"btn ghost\" id=\"wZ\">أعمال الأيام والزيارات</button></div>": "</p><button class=\"btn ghost\" id=\"wZ\">Daily ziyarat and duas</button></div>", "تبدأ في ": "Starts in ", "جاري التحميل…": "Loading…", "الجزء ": "Juz ", "سورة ": "Surah ", "<div class=\"card center\"><p>وصلت إلى نهاية ورد اليوم. هل أتممته؟</p><button class=\"btn\" id=\"ecb\">نعم، أتممت الورد ✓</button></div>": "<div class=\"card center\"><p>You reached the end of today's reading. Did you finish it?</p><button class=\"btn\" id=\"ecb\">Yes, I finished ✓</button></div>", "<p>تعذر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</p><button class=\"btn sm\" id=\"rt\">إعادة المحاولة</button>": "<p>Could not load the page. Check your internet connection.</p><button class=\"btn sm\" id=\"rt\">Retry</button>", "ص ": "p. ", "\">السور</button><button data-t=\"j\" class=\"": "\">Surahs</button><button data-t=\"j\" class=\"", "\">الأجزاء</button></div>": "\">Juz</button></div>", "<input id=\"sf\" type=\"text\" placeholder=\"ابحث عن سورة…\">": "<input id=\"sf\" type=\"text\" placeholder=\"Search surah (Arabic name)…\">", "يبدأ من الصفحة ": "Starts at page ", "مكية": "Meccan", "مدنية": "Medinan", " آية": " verses", "<div class=\"card center\">يلزم اتصال بالإنترنت لتحميل الفهرس لأول مرة.</div>": "<div class=\"card center\">An internet connection is needed to load the index the first time.</div>", "بقي من ورد اليوم: ": "Left of today's reading: ", "ورد اليوم: ": "Today's reading: ", "ختمة": "Khatma", "SUMMARY:ختمة - ورد القرآن اليومي": "SUMMARY:Khatma - Daily Quran reading", "جاري التحميل: ": "Downloading: ", "تعذر تحميل ": "Failed to download ", " صفحة، أعد المحاولة.": " pages, try again.", "تم تحميل المصحف كاملاً ✓": "Quran fully downloaded ✓", "فاتح": "Light", "ورقي": "Paper", "ليلي": "Night", "<div class=\"card\"><h2>حسابي</h2><div id=\"pf\"></div><button class=\"btn ghost\" id=\"pe\">تعديل بياناتي</button><button class=\"btn ghost\" id=\"pd\">حذف حسابي</button></div>": "<div class=\"card\"><h2>My account</h2><div id=\"pf\"></div><button class=\"btn ghost\" id=\"pe\">Edit my details</button><button class=\"btn ghost\" id=\"pd\">Delete my account</button></div>", "<div class=\"card\"><h2>المظهر</h2><div class=\"chips\">": "<div class=\"card\"><h2>Appearance</h2><div class=\"chips\">", "<label class=\"mut\">حجم الخط</label><input id=\"fs\" type=\"range\" min=\"22\" max=\"46\" value=\"": "<label class=\"mut\">Font size</label><input id=\"fs\" type=\"range\" min=\"22\" max=\"46\" value=\"", "<div class=\"card\"><h2>التذكير اليومي</h2><div class=\"row\"><span>تفعيل التذكير</span><input id=\"rm\" type=\"checkbox\" ": "<div class=\"card\"><h2>Daily reminder</h2><div class=\"row\"><span>Enable reminder</span><input id=\"rm\" type=\"checkbox\" ", "<label class=\"mut\">وقت التذكير</label><input id=\"rt\" type=\"time\" value=\"": "<label class=\"mut\">Reminder time</label><input id=\"rt\" type=\"time\" value=\"", "<button class=\"btn gold\" id=\"ics\">إضافة تذكير يومي إلى تقويم الجوال</button>": "<button class=\"btn gold\" id=\"ics\">Add a daily reminder to your phone calendar</button>", "<p class=\"note\">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>": "<p class=\"note\">The in-app alert only works while the page is open. For a guaranteed reminder even when the app is closed, add the reminder to your phone calendar with the button above.</p></div>", "<div class=\"card\"><h2>القراءة بدون إنترنت</h2><p class=\"mut\" id=\"dls\">جاري الفحص…</p><button class=\"btn\" id=\"dl\">تحميل المصحف كاملاً</button></div>": "<div class=\"card\"><h2>Read offline</h2><p class=\"mut\" id=\"dls\">Checking…</p><button class=\"btn\" id=\"dl\">Download the full Quran</button></div>", "<div class=\"card\"><h2>الختمة</h2><button class=\"btn ghost\" id=\"cp2\">تغيير عدد الصفحات اليومية</button><button class=\"btn ghost\" id=\"rs\">إعادة تعيين التقدم</button></div>": "<div class=\"card\"><h2>Khatma</h2><button class=\"btn ghost\" id=\"cp2\">Change pages per day</button><button class=\"btn ghost\" id=\"rs\">Reset progress</button></div>", "<div class=\"card\"><p class=\"note\">النص القرآني برواية حفص عن عاصم بالرسم العثماني، يُجلب من واجهة alquran.cloud ويُعرض كما هو دون تعديل. ننصح دائماً بمراجعة المصحف المطبوع للتأكد.</p></div>": "<div class=\"card\"><p class=\"note\">The Quran text is in the Hafs from Asim narration with the Uthmani script, fetched from the alquran.cloud API and shown as is, without modification. We always recommend checking against a printed Mushaf.</p></div>", "الاسم": "Name", "العمر": "Age", "المحافظة": "Governorate", "الهاتف": "Phone", "البريد": "Email", "سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟": "Your account data will be deleted from this device. Are you sure?", "سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟": "Your progress in the current Khatma will be erased. Are you sure?", "المصحف محمّل بالكامل ✓": "Quran fully downloaded ✓", "محمّل ": "Downloaded ", "بغداد": "Baghdad", "البصرة": "Basra", "نينوى": "Nineveh", "أربيل": "Erbil", "النجف": "Najaf", "كربلاء": "Karbala", "ذي قار": "Dhi Qar", "بابل": "Babil", "الأنبار": "Anbar", "ديالى": "Diyala", "كركوك": "Kirkuk", "صلاح الدين": "Saladin", "ميسان": "Maysan", "واسط": "Wasit", "المثنى": "Muthanna", "القادسية": "Qadisiyyah", "دهوك": "Duhok", "السليمانية": "Sulaymaniyah", "حلبجة": "Halabja", "خارج العراق": "Outside Iraq", "اكتب اسمك (حرفان على الأقل)": "Enter your name (at least 2 letters)", "اكتب عمراً صحيحاً": "Enter a valid age", "اختر المحافظة": "Choose your governorate", "اكتب رقم هاتف صحيح (مثال: 07701234567)": "Enter a valid phone number (e.g. 07701234567)", "البريد الإلكتروني غير صحيح": "The email address is not valid", "تعديل بياناتي": "Edit my details", "أهلاً بك في ختمة": "Welcome to Khatma", "عدّل بياناتك ثم احفظ.": "Edit your details then save.", "سجّل بياناتك لنبدأ.": "Register to get started.", " تُحفظ على جهازك فقط ولا تُرسل لأي جهة.</p>": " Stored on your device only and not sent to anyone.</p>", "<label class=\"mut\">الاسم *</label><input id=\"rn\" type=\"text\" maxlength=\"40\" autocomplete=\"name\">": "<label class=\"mut\">Name *</label><input id=\"rn\" type=\"text\" maxlength=\"40\" autocomplete=\"name\">", "<label class=\"mut\">العمر *</label><input id=\"ra\" type=\"number\" min=\"5\" max=\"110\" inputmode=\"numeric\">": "<label class=\"mut\">Age *</label><input id=\"ra\" type=\"number\" min=\"5\" max=\"110\" inputmode=\"numeric\">", "<label class=\"mut\">المحافظة *</label><select id=\"rg\"><option value=\"\">اختر المحافظة</option>": "<label class=\"mut\">Governorate *</label><select id=\"rg\"><option value=\"\">Choose governorate</option>", "<label class=\"mut\">المنطقة / الحي</label><input id=\"rz\" type=\"text\" maxlength=\"40\">": "<label class=\"mut\">Area / neighborhood</label><input id=\"rz\" type=\"text\" maxlength=\"40\">", "<label class=\"mut\">رقم الهاتف (واتساب) *</label><input id=\"rp\" type=\"tel\" inputmode=\"tel\" autocomplete=\"tel\" maxlength=\"20\" dir=\"ltr\" placeholder=\"07701234567\">": "<label class=\"mut\">Phone number (WhatsApp) *</label><input id=\"rp\" type=\"tel\" inputmode=\"tel\" autocomplete=\"tel\" maxlength=\"20\" dir=\"ltr\" placeholder=\"07701234567\">", "<label class=\"mut\">البريد الإلكتروني (اختياري)</label><input id=\"re\" type=\"email\" inputmode=\"email\" autocomplete=\"email\" maxlength=\"80\" dir=\"ltr\">": "<label class=\"mut\">Email (optional)</label><input id=\"re\" type=\"email\" inputmode=\"email\" autocomplete=\"email\" maxlength=\"80\" dir=\"ltr\">", "ابدأ": "Start", "<button class=\"btn ghost\" id=\"rcn\">إلغاء</button>": "<button class=\"btn ghost\" id=\"rcn\">Cancel</button>", "سبحان الله": "SubhanAllah (Glory be to God)", "الحمد لله": "Alhamdulillah (Praise be to God)", "الله أكبر": "Allahu Akbar (God is the Greatest)", "لا إله إلا الله": "La ilaha illa Allah (There is no god but God)", "أستغفر الله ربي وأتوب إليه": "Astaghfirullah (I seek forgiveness from God)", "لا حول ولا قوة إلا بالله": "La hawla wa la quwwata illa billah", "اللهم صلِّ على محمد وآل محمد": "Allahumma salli ala Muhammad wa aali Muhammad", "حسبنا الله ونعم الوكيل": "Hasbunallahu wa ni'mal wakeel", "سبحان الله والحمد لله ولا إله إلا الله والله أكبر": "SubhanAllah, Alhamdulillah, La ilaha illa Allah, Allahu Akbar", "ذكر مخصص": "Custom dhikr", "انتقل إلى: ": "Next: ", "تقبّل الله، أتممت تسبيح الزهراء (ع) 🤍": "May God accept it, you completed the Tasbih of Lady Fatima al-Zahra (a.s.) 🤍", "أتممت ": "Completed ", "من ": "of ", "بدون حد": "No limit", "اليوم: ": "Today: ", "  •  الدورات: ": "  •  Rounds: ", "  •  المجموع: ": "  •  Total: ", "\">تسبيح حر</button><button data-m=\"zahra\" class=\"": "\">Free tasbih</button><button data-m=\"zahra\" class=\"", "\">تسبيح الزهراء (ع)</button></div>": "\">Tasbih of Fatima al-Zahra (a.s.)</button></div>", "<div class=\"ring\" id=\"tsbR\"><button class=\"tsb\" id=\"tsbB\"><span id=\"tsbN\">٠</span><small id=\"tsbT\"></small></button></div>": "<div class=\"ring\" id=\"tsbR\"><button class=\"tsb\" id=\"tsbB\"><span id=\"tsbN\">0</span><small id=\"tsbT\"></small></button></div>", "<div class=\"row\" style=\"justify-content:center\"><button class=\"btn sm ghost\" id=\"tsbU\">تراجع</button><button class=\"btn sm ghost\" id=\"tsbZ\">تصفير</button></div>": "<div class=\"row\" style=\"justify-content:center\"><button class=\"btn sm ghost\" id=\"tsbU\">Undo</button><button class=\"btn sm ghost\" id=\"tsbZ\">Reset</button></div>", "<div class=\"card\"><h2>الأذكار</h2><div class=\"scrollx\" id=\"adk\"></div>": "<div class=\"card\"><h2>Adhkar</h2><div class=\"scrollx\" id=\"adk\"></div>", "<label class=\"mut\">الهدف (عدد التسبيحات)</label><div class=\"scrollx\" id=\"tgt\"></div>": "<label class=\"mut\">Target (number of counts)</label><div class=\"scrollx\" id=\"tgt\"></div>", "<input id=\"tgi\" type=\"number\" min=\"0\" max=\"100000\" inputmode=\"numeric\" placeholder=\"أو اكتب عدداً آخر (٠ = بدون حد)\">": "<input id=\"tgi\" type=\"number\" min=\"0\" max=\"100000\" inputmode=\"numeric\" placeholder=\"Or type another number (0 = no limit)\">", "<label class=\"mut\">أو اكتب ذكرك الخاص</label><input id=\"cus\" type=\"text\" maxlength=\"60\" placeholder=\"اكتب الذكر هنا\"></div>": "<label class=\"mut\">Or type your own dhikr</label><input id=\"cus\" type=\"text\" maxlength=\"60\" placeholder=\"Type the dhikr here\"></div>", "<div class=\"card\"><p class=\"note\">تسبيح الزهراء (ع): الله أكبر ٣٤، ثم الحمد لله ٣٣، ثم سبحان الله ٣٣. ينتقل العداد تلقائياً من ذكر لآخر.</p></div>": "<div class=\"card\"><p class=\"note\">Tasbih of Fatima al-Zahra (a.s.): Allahu Akbar 34, then Alhamdulillah 33, then SubhanAllah 33. The counter moves automatically from one dhikr to the next.</p></div>", "دعاء كميل": "Dua Kumayl", "يُستحب قراءته في ليالي الجمعة وليلة النصف من شعبان": "Recommended on Friday eves and on the night of mid-Sha'ban", "دعاء الندبة": "Dua Nudba", "يُستحب قراءته يوم الجمعة وفي عيد الفطر والأضحى والغدير": "Recommended on Fridays and on Eid al-Fitr, Eid al-Adha and Eid al-Ghadir", "دعاء الافتتاح": "Dua Iftitah", "من أدعية ليالي شهر رمضان": "One of the nightly duas of Ramadan", "دعاء أبي حمزة الثمالي": "Dua Abu Hamza al-Thumali", "من أدعية أسحار شهر رمضان": "One of the pre-dawn duas of Ramadan", "دعاء العهد": "Dua al-Ahd", "يُستحب قراءته كل صباح": "Recommended every morning", "دعاء التوسل": "Dua al-Tawassul", "من الأدعية المشهورة بالتوسل بالنبي وآله (ع)": "A well-known dua of seeking nearness through the Prophet and his Household (a.s.)", "دعاء الجوشن الكبير": "Dua al-Jawshan al-Kabir", "من أدعية شهر رمضان": "One of the duas of the month of Ramadan", "دعاء السفر": "Travel Supplication (Dua al-Safar)", "يُقرأ عند الانطلاق في السفر": "Recited when setting out on a journey", "النبي محمد (ص)": "Prophet Muhammad (s.a.w.)", "المدينة المنورة": "Medina", "السيدة فاطمة الزهراء (ع)": "Lady Fatima al-Zahra (a.s.)", "الإمام علي (ع)": "Imam Ali (a.s.)", "النجف الأشرف": "Najaf al-Ashraf", "الإمام الحسن المجتبى (ع)": "Imam al-Hasan al-Mujtaba (a.s.)", "البقيع - المدينة المنورة": "Al-Baqi' - Medina", "الإمام الحسين (ع)": "Imam al-Husayn (a.s.)", "كربلاء المقدسة": "Holy Karbala", "الإمام السجاد (ع)": "Imam al-Sajjad (a.s.)", "الإمام الباقر (ع)": "Imam al-Baqir (a.s.)", "الإمام الصادق (ع)": "Imam al-Sadiq (a.s.)", "الإمام الكاظم (ع)": "Imam al-Kadhim (a.s.)", "الكاظمية - بغداد": "Kadhimiya - Baghdad", "الإمام الرضا (ع)": "Imam al-Ridha (a.s.)", "مشهد المقدسة": "Holy Mashhad", "الإمام الجواد (ع)": "Imam al-Jawad (a.s.)", "الإمام الهادي (ع)": "Imam al-Hadi (a.s.)", "سامراء": "Samarra", "الإمام الحسن العسكري (ع)": "Imam al-Hasan al-Askari (a.s.)", "الإمام المهدي (عج)": "Imam al-Mahdi (a.t.f.s.)", "صاحب العصر والزمان": "Master of the Age and Time", "الأحد": "Sunday", "أمير المؤمنين علي (ع) والسيدة فاطمة الزهراء (ع)": "Imam Ali (a.s.) and Lady Fatima al-Zahra (a.s.)", "الاثنين": "Monday", "الإمامان الحسن والحسين (ع)": "Imams al-Hasan and al-Husayn (a.s.)", "الثلاثاء": "Tuesday", "الأئمة السجاد والباقر والصادق (ع)": "Imams al-Sajjad, al-Baqir and al-Sadiq (a.s.)", "الأربعاء": "Wednesday", "الأئمة الكاظم والرضا والجواد والهادي (ع)": "Imams al-Kadhim, al-Ridha, al-Jawad and al-Hadi (a.s.)", "الخميس": "Thursday", "الجمعة": "Friday", "السبت": "Saturday", "رسول الله (ص)": "The Messenger of God (s.a.w.)", "زيارة الجامعة الكبيرة": "Ziyarat al-Jami'a al-Kabira", "زيارة جامعة لجميع الأئمة (ع)، تُقرأ في أي وقت": "A comprehensive ziyarat for all the Imams (a.s.), recited at any time", "زيارة وارث": "Ziyarat Warith", "زيارة للإمام الحسين (ع)، تُقرأ في أي وقت": "A ziyarat of Imam al-Husayn (a.s.), recited at any time", "زيارة أمين الله": "Ziyarat Amin Allah", "زيارة لأمير المؤمنين علي (ع)، تُقرأ في أي وقت": "A ziyarat of Imam Ali (a.s.), recited at any time", "زيارة آل ياسين": "Ziyarat Al Yasin", "زيارة للإمام المهدي (عج)": "A ziyarat of Imam al-Mahdi (a.t.f.s.)", "زيارة عاشوراء": "Ziyarat Ashura", "للإمام الحسين (ع)، تُقرأ يوم عاشوراء وفي غيره": "Of Imam al-Husayn (a.s.), recited on Ashura day and at other times", "زيارة الأربعين": "Ziyarat al-Arbaeen", "للإمام الحسين (ع)، تُقرأ يوم الأربعين (٢٠ صفر)": "Of Imam al-Husayn (a.s.), recited on Arbaeen day (20 Safar)", "\n(سورة الزخرف، الآيتان ": "\n(Surah Az-Zukhruf, verses ", " و": " and ", ")، وتُقرأ عند الانطلاق في السفر.": "), recited when setting out on a journey.", "<div class=\"mbox\"><h2></h2><div class=\"txt\" id=\"mtx\">جاري التحميل…</div><button class=\"btn\" id=\"mcl\">إغلاق</button></div>": "<div class=\"mbox\"><h2></h2><div class=\"txt\" id=\"mtx\">Loading…</div><button class=\"btn\" id=\"mcl\">Close</button></div>", "تعذر تحميل الآيات، تأكد من الاتصال بالإنترنت.": "Could not load the verses, check your internet connection.", "تعديل النص المحفوظ": "Edit saved text", "إضافة نص": "Add text", "<div class=\"mbox\"><h2></h2><p class=\"mut\">انسخ النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به) والصقه هنا. يُحفظ على جهازك فقط ويظهر داخل التطبيق.</p><textarea id=\"mta\" dir=\"rtl\"></textarea><button class=\"btn\" id=\"msv\">حفظ</button><button class=\"btn ghost\" id=\"mcn\">إلغاء</button></div>": "<div class=\"mbox\"><h2></h2><p class=\"mut\">Copy the text from a trusted source (a printed Mafatih al-Jinan or a site you trust) and paste it here. It is saved on your device only and appears inside the app.</p><textarea id=\"mta\" dir=\"rtl\"></textarea><button class=\"btn\" id=\"msv\">Save</button><button class=\"btn ghost\" id=\"mcn\">Cancel</button></div>", "تم حفظ النص ✓": "Text saved ✓", "تم حذف النص": "Text deleted", "اقرأ": "Read", "ألصق النص": "Paste text", "بحث": "Search", "مفاتيح الجنان": "Mafatih al-Jinan", "زيارات الأئمة": "Ziyarat of the Imams", "أيام الأسبوع": "Days of the week", "الزيارات العامة": "General ziyarat", "المرقد: ": "Shrine: ", "هذا القسم فهرس لأدعية وزيارات مفاتيح الجنان وأوقاتها. لم أكتب النصوص من عندي حرصاً على سلامتها من الخطأ. اضغط «ألصق النص» وألصق النص من مصدر موثوق (مفاتيح الجنان المطبوع أو موقع تثق به)، فيُحفظ على جهازك ويظهر بعدها داخل التطبيق بزر «اقرأ». زر «بحث» يساعدك تلقى النص. دعاء السفر يبدأ بآيتين قرآنيتين تُجلبان من واجهة القرآن مباشرة.": "This section is an index of the duas and ziyarat of Mafatih al-Jinan and their times. The texts are not written by me, to keep them free of errors. Tap \"Paste text\" and paste the text from a trusted source (a printed Mafatih al-Jinan or a site you trust); it is saved on your device and then appears inside the app with the \"Read\" button. The \"Search\" button helps you find the text. The Travel Supplication begins with two Quranic verses fetched directly from the Quran API.", "رفيقك لختم القرآن الكريم": "Your companion for completing the Quran", "السابقة": "Previous", "التالية": "Next", "الورد": "Daily", "المصحف": "Quran", "الفهرس": "Index", "التسبيح": "Tasbih", "الأدعية": "Duas", "الإعدادات": "Settings"};
+const tl = s => (st.lang === 'en' && EN[s] !== undefined) ? EN[s] : s;
+const dk = s => (st.lang === 'en' && EN[s] !== undefined) ? s + ' — ' + EN[s] : s;
+const LT = t => {
+  if (st.lang !== 'en') return t;
+  if (t.startsWith('زيارة ') && EN[t.slice(6)] !== undefined) return 'Ziyarat of ' + EN[t.slice(6)];
+  if (t.startsWith('يوم ') && EN[t.slice(4)] !== undefined) return EN[t.slice(4)];
+  return EN[t] !== undefined ? EN[t] : t;
+};
+let regDraft = null;
+function langRow() {
+  return '<div class="center"><div class="chips" style="justify-content:center"><button class="chip' + (st.lang === 'ar' ? ' on' : '') + '" data-lg="ar">العربية</button><button class="chip' + (st.lang === 'en' ? ' on' : '') + '" data-lg="en">English</button></div></div>';
+}
+function applyLang() {
+  const en = st.lang === 'en';
+  document.documentElement.lang = en ? 'en' : 'ar';
+  document.documentElement.dir = en ? 'ltr' : 'rtl';
+  document.title = tl('ختمة');
+  const set = (id, k) => { const e = $(id); if (e) e.textContent = tl(k); };
+  set('hT', 'ختمة'); set('hS', 'رفيقك لختم القرآن الكريم');
+  set('pv', 'السابقة'); set('pv2', 'السابقة'); set('nx', 'التالية'); set('nx2', 'التالية');
+  document.querySelectorAll('nav button em').forEach(e => { e.textContent = tl(e.dataset.k); });
+}
+function setLang(l) {
+  if (curView === 'reg' && $('rn')) regDraft = { name: $('rn').value, age: $('ra').value, gov: $('rg').value, area: $('rz').value, phone: $('rp').value, email: $('re').value };
+  st.lang = l; save(); applyLang(); go(curView);
 }
 
 // ---------- التشغيل ----------
 applyLook();
+applyLang();
 { const lg = $('lg'); if (lg) lg.src = ICON; }
 rollover();
 if (!st.profile) go('reg'); else { go('wird'); if (hasPartial()) askPartial(); }
