@@ -151,7 +151,7 @@ let st = Object.assign({}, DEF, LS.get('khatm_state', {}));
 st.remind = Object.assign({}, DEF.remind, st.remind || {});
 st.tsb = Object.assign({}, DEF.tsb, st.tsb || {});
 if (st.todayRead < st.todayStart) st.todayRead = st.todayStart;
-const save = () => LS.set('khatm_state', st);
+const save = () => { LS.set('khatm_state', st); if (typeof pushSyncSoon === 'function') pushSyncSoon(); };
 
 // ---------- التاريخ ----------
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -467,6 +467,57 @@ function notify(msg) {
   try { if ('Notification' in window && Notification.permission === 'granted') new Notification(tl('ختمة'), { body: msg }); } catch (e) {}
 }
 
+// ---------- الإشعارات الحقيقية (FCM) ----------
+const FB_CFG = { apiKey: "AIzaSyDvnY8z_snpG7OXD04YneOeH68uO8am3WM", authDomain: "khatma-27e61.firebaseapp.com", projectId: "khatma-27e61", storageBucket: "khatma-27e61.firebasestorage.app", messagingSenderId: "1027753484054", appId: "1:1027753484054:web:079f5439cae2a8829e7a37" };
+const VAPID = 'BInUk9ycqoElv6LrePtwv54EwFDe8lgmi6omYnUVydVwlpysBRpNYb1Yg3wj-ToubRcE20krHpgLwTtJJ1hxYjU';
+const isStandalone = () => window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+const loadJS = src => new Promise((res, rej) => { const x = document.createElement('script'); x.src = src; x.onload = res; x.onerror = rej; document.head.appendChild(x); });
+let fbReady = null;
+function fbInit() {
+  if (!fbReady) fbReady = (async () => {
+    const b = 'https://www.gstatic.com/firebasejs/10.12.2/';
+    await loadJS(b + 'firebase-app-compat.js');
+    await Promise.all([loadJS(b + 'firebase-messaging-compat.js'), loadJS(b + 'firebase-firestore-compat.js')]);
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  })().catch(e => { fbReady = null; throw e; });
+  return fbReady;
+}
+const pushState = { get: () => LS.get('khatm_push', null), set: o => LS.set('khatm_push', o) };
+function pushPayload() {
+  const live = st.remind.on && st.plan && st.done < TOTAL;
+  return { time: st.remind.time, tz: -new Date().getTimezoneOffset(), on: !!live, doneDate: st.todayDone ? today() : '', msg: live ? (nudge() + '\n' + leftText()).slice(0, 250) : '', title: tl('ختمة'), lang: st.lang };
+}
+async function pushWrite(force) {
+  const ps = pushState.get(); if (!ps || !ps.token) return;
+  const p = pushPayload(), key = JSON.stringify(p);
+  if (!force && ps.last === key) return;
+  await fbInit();
+  await firebase.firestore().collection('devices').doc(ps.id).set(Object.assign({ token: ps.token }, p), { merge: true });
+  const ps2 = pushState.get() || ps; ps2.last = key; pushState.set(ps2);
+}
+let pushTimer = null;
+function pushSyncSoon() {
+  if (!pushState.get() || !navigator.onLine) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => { pushWrite(false).catch(() => {}); }, 3000);
+}
+async function enablePush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window) || !isStandalone()) {
+    toast(tl('ثبّت التطبيق على الشاشة الرئيسية أولاً (مشاركة ← إضافة إلى الشاشة الرئيسية) ثم افتحه من هناك.')); return false;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { toast(tl('لم يُسمح بالإشعارات. فعّلها من إعدادات الجوال.')); return false; }
+  await fbInit();
+  const reg = await navigator.serviceWorker.ready;
+  const token = await firebase.messaging().getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg });
+  if (!token) throw new Error('no token');
+  const ps = pushState.get() || {};
+  if (!ps.id) ps.id = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  ps.token = token; ps.last = ''; pushState.set(ps);
+  await pushWrite(true);
+  return true;
+}
+
 function downloadICS() {
   const t = st.remind.time.split(':');
   const d = new Date(); d.setHours(+t[0], +t[1], 0, 0);
@@ -510,6 +561,7 @@ async function renderSettings() {
     tl('<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ') + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
     tl('<label class="mut">وقت التذكير</label><input id="rt" type="time" value="') + st.remind.time + '">' +
     tl('<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>') +
+    tl('<button class="btn" id="pushb">تفعيل الإشعارات الحقيقية (حتى والتطبيق مغلق)</button><p class="note" id="pushs"></p>') +
     tl('<p class="note">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>') +
     tl('<div class="card"><h2>القراءة بدون إنترنت</h2><p class="mut" id="dls">جاري الفحص…</p><button class="btn" id="dl">تحميل المصحف كاملاً</button></div>') +
     tl('<div class="card"><h2>الختمة</h2><button class="btn ghost" id="cp2">تغيير عدد الصفحات اليومية</button><button class="btn ghost" id="rs">إعادة تعيين التقدم</button></div>') +
@@ -534,6 +586,11 @@ async function renderSettings() {
   };
   $('rt').onchange = () => { if ($('rt').value) { st.remind.time = $('rt').value; st.notifDate = ''; save(); } };
   $('ics').onclick = downloadICS;
+  $('pushs').textContent = (pushState.get() && pushState.get().token) ? tl('مفعّلة على هذا الجهاز ✓') : tl('غير مفعّلة بعد. ثبّت التطبيق على الشاشة الرئيسية أولاً ثم اضغط الزر.');
+  $('pushb').onclick = async () => {
+    try { if (await enablePush()) { st.remind.on = true; save(); renderSettings(); toast(tl('تم تفعيل الإشعارات ✓')); } }
+    catch (e) { toast(tl('تعذر التفعيل. تأكد من الإنترنت وحاول مرة ثانية.')); }
+  };
   $('dl').onclick = downloadAll;
   $('cp2').onclick = () => { selPages = ppd() || 5; st.plan = null; save(); go('wird'); };
   $('rs').onclick = () => { if (confirm(tl('سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟'))) { st.done = 0; st.todayStart = 0; st.todayRead = 0; st.todayDone = false; st.todayDeferred = false; st.streak = 0; st.lastDate = ''; save(); go('wird'); } };
@@ -794,6 +851,15 @@ const LT = t => {
   return EN[t] !== undefined ? EN[t] : t;
 };
 Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
+Object.assign(EN, {
+  '<button class="btn" id="pushb">تفعيل الإشعارات الحقيقية (حتى والتطبيق مغلق)</button><p class="note" id="pushs"></p>': '<button class="btn" id="pushb">Enable real notifications (even when the app is closed)</button><p class="note" id="pushs"></p>',
+  'مفعّلة على هذا الجهاز ✓': 'Enabled on this device ✓',
+  'غير مفعّلة بعد. ثبّت التطبيق على الشاشة الرئيسية أولاً ثم اضغط الزر.': 'Not enabled yet. Install the app to your Home Screen first, then tap the button.',
+  'ثبّت التطبيق على الشاشة الرئيسية أولاً (مشاركة ← إضافة إلى الشاشة الرئيسية) ثم افتحه من هناك.': 'Install the app to your Home Screen first (Share → Add to Home Screen), then open it from there.',
+  'لم يُسمح بالإشعارات. فعّلها من إعدادات الجوال.': 'Notifications were not allowed. Enable them in your phone settings.',
+  'تم تفعيل الإشعارات ✓': 'Notifications enabled ✓',
+  'تعذر التفعيل. تأكد من الإنترنت وحاول مرة ثانية.': 'Could not enable. Check your internet and try again.'
+});
 let regDraft = null;
 function langRow() {
   return '<div class="center"><div class="chips" style="justify-content:center"><button class="chip' + (st.lang === 'ar' ? ' on' : '') + '" data-lg="ar">العربية</button><button class="chip' + (st.lang === 'en' ? ' on' : '') + '" data-lg="en">English</button></div></div>';
@@ -833,6 +899,7 @@ document.addEventListener('visibilitychange', () => {
   checkRemind();
 });
 try{if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')}catch(e){}
+try{pushSyncSoon()}catch(e){}
 </script>
 </body>
 </html>
