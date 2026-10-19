@@ -180,10 +180,12 @@ input[type=checkbox]{accent-color:var(--pri);width:20px;height:20px}
 /* نافذة التنبيه والرسائل */
 .mbox{border-radius:14px;border:1px solid var(--gold);box-shadow:inset 0 0 0 4px var(--card),inset 0 0 0 5px var(--gsoft)}
 #toast{background:var(--lapis);color:#fff6d6;border:1px solid var(--gold)}
+header #hdAcc{position:absolute;left:12px;top:56px;z-index:7;background:rgba(255,255,255,.12);color:var(--gold2);border:1.5px solid var(--gold);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.reg header #hdAcc{display:none}
 </style>
 </head>
 <body>
-<header><div class="bsm" aria-hidden="true">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div><div class="brand"><img id="lg" alt="" style="width:34px;height:34px;border-radius:9px;vertical-align:middle;margin-left:8px"><span id="hT">ختمة</span></div><small id="hS">رفيقك لختم القرآن الكريم</small></header>
+<header><button id="hdAcc" type="button" aria-label="الحساب"></button><div class="bsm" aria-hidden="true">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div><div class="brand"><img id="lg" alt="" style="width:34px;height:34px;border-radius:9px;vertical-align:middle;margin-left:8px"><span id="hT">ختمة</span></div><small id="hS">رفيقك لختم القرآن الكريم</small></header>
 <div id="toast"></div>
 <div id="modal"></div>
 
@@ -377,6 +379,7 @@ function go(v) {
   if (v === 'pray') renderPray();
   if (v !== 'pray' && cmp.on) compassStop();
   document.body.classList.toggle('reg', v === 'reg');
+  updAcc();
   if (leaving && hasPartial()) askPartial();
 }
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => go(b.dataset.v));
@@ -444,8 +447,10 @@ function renderWird() {
     + '<button class="btn ghost" id="wZ2">' + tl('دعاء اليوم') + '</button>'
     + (acts ? '<div class="mut" style="margin:10px 4px 2px"><b>' + tl('المستحبات:') + '</b><ul style="margin:6px 18px 0;padding:0;line-height:1.9">' + acts + '</ul></div>' : '')
     + '<button class="btn ghost" id="wZ">' + tl('كل الأيام والزيارات') + '</button></div>';
-  v.innerHTML = greet + prayCardHTML() + h + zi + statsHTML();
+  const regc = st.profile ? '' : tl('<div class="card"><p class="mut">أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».</p><button class="btn ghost" id="wReg">إضافة اسمي</button></div>');
+  v.innerHTML = greet + prayCardHTML() + h + zi + regc + statsHTML();
   if ($('pcard')) $('pcard').onclick = () => go('pray');
+  if ($('wReg')) $('wReg').onclick = () => { regEdit = true; regFrom = 'wird'; go('reg'); };
   $('wZ').onclick = () => { duasTab = 'week'; go('duas'); };
   $('wZ1').onclick = () => showText('يوم ' + tz[0]);
   $('wZ2').onclick = () => showText('دعاء يوم ' + tz[0]);
@@ -1175,7 +1180,7 @@ async function renderSettings() {
   const v = $('v-set');
   const th = [['light', tl('فاتح')], ['sepia', tl('ورقي')], ['dark', tl('ليلي')]];
   v.innerHTML =
-    tl('<div class="card"><h2>حسابي</h2><div id="pf"></div><button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button></div>') +
+    tl('<div class="card"><h2>حسابي</h2><div id="pf"></div>' + (st.profile ? '<button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button>' : '<p class="mut">لم تسجّل بعد. التسجيل اختياري.</p><button class="btn" id="pe">تسجيل الدخول / إنشاء حساب</button>') + '</div>') +
     tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
     tl('<div class="card"><h2>المظهر</h2><div class="chips">') + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
     tl('<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="') + st.fs + '" style="width:100%"></div>' +
@@ -1196,8 +1201,8 @@ async function renderSettings() {
       d.appendChild(a); d.appendChild(b); pf.appendChild(d);
     });
   }
-  $('pe').onclick = () => { regEdit = true; go('reg'); };
-  $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { st.profile = null; save(); regEdit = false; go('reg'); } };
+  $('pe').onclick = () => { regEdit = true; regFrom = 'set'; go('reg'); };
+  if ($('pd')) $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { st.profile = null; save(); regEdit = false; go('wird'); } };
   v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
   $('fs').oninput = () => { st.fs = +$('fs').value; save(); applyLook(); };
@@ -1231,6 +1236,12 @@ function validProfile(p) {
   if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) return tl('البريد الإلكتروني غير صحيح');
   return '';
 }
+let regFrom = 'set';
+function updAcc() {
+  const b = $('hdAcc'); if (!b) return;
+  b.textContent = st.profile && st.profile.name ? '👤 ' + st.profile.name : tl('تسجيل الدخول');
+  b.onclick = () => { regEdit = true; regFrom = (curView === 'reg' ? 'wird' : curView); go('reg'); };
+}
 function renderReg() {
   const v = $('v-reg'), p = Object.assign({}, st.profile || {}, regDraft || {}); regDraft = null;
   v.innerHTML = '<div class="center"><img alt="" src="' + ICON + '" style="width:120px;height:120px;border-radius:26px;margin:6px 0 12px"></div>' + langRow() + '<div class="card"><h2>' + (regEdit ? tl('تعديل بياناتي') : tl('أهلاً بك في ختمة')) + '</h2>' +
@@ -1250,9 +1261,9 @@ function renderReg() {
     const err = validProfile(np);
     if (err) { $('rerr').textContent = err; return; }
     np.age = Number(np.age);
-    st.profile = np; save(); regEdit = false; go('wird');
+    st.profile = np; save(); regEdit = false; regFrom = 'set'; go('wird');
   };
-  if ($('rcn')) $('rcn').onclick = () => { regEdit = false; go('set'); };
+  if ($('rcn')) $('rcn').onclick = () => { regEdit = false; const f = regFrom; regFrom = 'set'; go(f); };
 }
 
 // ---------- التسبيح والأذكار ----------
@@ -1562,7 +1573,7 @@ const LT = t => {
   return EN[t] !== undefined ? EN[t] : t;
 };
 Object.assign(EN, {'الصلاة': 'Prayer', 'دعاء الفرج': 'Dua al-Faraj', 'للدعاء بتعجيل الفرج': 'For the hastening of the relief', 'دعاء اليوم': 'Dua of the day', 'دعاء يوم السبت': 'Dua of Saturday', 'دعاء يوم الأحد': 'Dua of Sunday', 'دعاء يوم الاثنين': 'Dua of Monday', 'دعاء يوم الثلاثاء': 'Dua of Tuesday', 'دعاء يوم الأربعاء': 'Dua of Wednesday', 'دعاء يوم الخميس': 'Dua of Thursday', 'دعاء يوم الجمعة': 'Dua of Friday'});
-Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
+Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
 Object.assign(EN, {
   '<button class="btn" id="pushb">تفعيل الإشعارات الحقيقية (حتى والتطبيق مغلق)</button><p class="note" id="pushs"></p>': '<button class="btn" id="pushb">Enable real notifications (even when the app is closed)</button><p class="note" id="pushs"></p>',
   'مفعّلة على هذا الجهاز ✓': 'Enabled on this device ✓',
@@ -1598,7 +1609,7 @@ applyLang();
 LOADERS['دعاء السفر']().catch(() => {});
 { const lg = $('lg'); if (lg) lg.src = ICON; }
 rollover();
-if (!st.profile) go('reg'); else { go('wird'); if (hasPartial()) askPartial(); }
+go('wird'); if (hasPartial()) askPartial();
 let nudgeT;
 document.addEventListener('visibilitychange', () => {
   clearTimeout(nudgeT);
