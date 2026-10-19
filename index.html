@@ -1103,13 +1103,9 @@ function renderPray(keepScroll) {
   v.innerHTML = h;
   // ربط
   $('pcs').onchange = e => { st.pray.city = e.target.value; save(); prayOff = 0; renderPray(); };
-  $('pgps').onclick = () => {
-    if (!navigator.geolocation) { toast(PT('الموقع غير مدعوم على هذا الجهاز.', 'Geolocation is not supported.')); return; }
+  $('pgps').onclick = async () => {
     toast(PT('جاري تحديد الموقع…', 'Locating…'));
-    navigator.geolocation.getCurrentPosition(p => {
-      const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'Asia/Baghdad';
-      st.pray.custom = { lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4), tz: tz }; st.pray.city = 'custom'; save(); renderPray();
-    }, () => toast(PT('تعذّر تحديد الموقع. اسمح للموقع من إعدادات المتصفح أو اختر مدينتك.', 'Could not get your location. Allow location access or choose a city.')), { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    if (await gpsForPrayer()) renderPray(); else toast(gpsMsg());
   };
   $('pdn').onclick = () => { prayOff++; renderPray(); }; $('pdp').onclick = () => { prayOff--; renderPray(); };
   if ($('ptd')) $('ptd').onclick = () => { prayOff = 0; renderPray(); };
@@ -1573,7 +1569,7 @@ const LT = t => {
   return EN[t] !== undefined ? EN[t] : t;
 };
 Object.assign(EN, {'الصلاة': 'Prayer', 'دعاء الفرج': 'Dua al-Faraj', 'للدعاء بتعجيل الفرج': 'For the hastening of the relief', 'دعاء اليوم': 'Dua of the day', 'دعاء يوم السبت': 'Dua of Saturday', 'دعاء يوم الأحد': 'Dua of Sunday', 'دعاء يوم الاثنين': 'Dua of Monday', 'دعاء يوم الثلاثاء': 'Dua of Tuesday', 'دعاء يوم الأربعاء': 'Dua of Wednesday', 'دعاء يوم الخميس': 'Dua of Thursday', 'دعاء يوم الجمعة': 'Dua of Friday'});
-Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
+Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.':'Location is not allowed. Turn on Location Services for the app (or Safari) in phone Settings and try again, or choose your city.','لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.':'Could not get your location now. Make sure Location Services/GPS is on and try somewhere open, or choose your city.','الموقع غير مدعوم على هذا الجهاز.':'Location is not supported on this device.','السماح بالإشعارات':'Allow notifications','هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.':'Allow Khatma to send you notifications? We use them for adhan alerts and your daily Quran reminder.','نعم، أسمح':'Yes, allow','ليس الآن':'Not now','السماح بالموقع':'Allow location','هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟':'Allow Khatma to use your location to set accurate prayer times and qibla for where you are?','لا، سأختار مدينتي':'No, I will choose my city','جاري تحديد الموقع…':'Locating…','تم تحديد موقعك وأوقات الصلاة.':'Location set. Prayer times updated.','تعذّر تحديد الموقع. يمكنك اختيار مدينتك من تبويب الصلاة.':'Could not get your location. You can choose your city in the Prayer tab.'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
 Object.assign(EN, {
   '<button class="btn" id="pushb">تفعيل الإشعارات الحقيقية (حتى والتطبيق مغلق)</button><p class="note" id="pushs"></p>': '<button class="btn" id="pushb">Enable real notifications (even when the app is closed)</button><p class="note" id="pushs"></p>',
   'مفعّلة على هذا الجهاز ✓': 'Enabled on this device ✓',
@@ -1609,7 +1605,55 @@ applyLang();
 LOADERS['دعاء السفر']().catch(() => {});
 { const lg = $('lg'); if (lg) lg.src = ICON; }
 rollover();
-go('wird'); if (hasPartial()) askPartial();
+function onbAsk(icon, title, text, yes, no) {
+  return new Promise(res => {
+    const m = $('modal');
+    m.innerHTML = '<div class="mbox" style="text-align:center"><div style="font-size:54px">' + icon + '</div><h2></h2><p class="mut" style="line-height:1.8"></p><button class="btn" id="oy"></button><button class="btn ghost" id="on"></button></div>';
+    m.querySelector('h2').textContent = title; m.querySelector('p').textContent = text;
+    $('oy').textContent = yes; $('on').textContent = no;
+    m.classList.add('on');
+    $('oy').onclick = () => { m.classList.remove('on'); res(true); };
+    $('on').onclick = () => { m.classList.remove('on'); res(false); };
+  });
+}
+let gpsErr = 0;
+function gpsOnce(hi, ms) {
+  return new Promise(res => navigator.geolocation.getCurrentPosition(p => res(p), e => { gpsErr = e && e.code || 2; res(null); }, { enableHighAccuracy: hi, timeout: ms, maximumAge: 600000 }));
+}
+async function gpsForPrayer() {
+  gpsErr = 0;
+  if (!navigator.geolocation) { gpsErr = 9; return false; }
+  let p = await gpsOnce(false, 20000);
+  if (!p && gpsErr !== 1) p = await gpsOnce(true, 25000);
+  if (!p) return false;
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'Asia/Baghdad';
+  st.pray.custom = { lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4), tz: tz }; st.pray.city = 'custom'; save();
+  return true;
+}
+function gpsMsg() {
+  if (gpsErr === 1) return tl('الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.');
+  if (gpsErr === 9) return tl('الموقع غير مدعوم على هذا الجهاز.');
+  return tl('لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.');
+}
+async function onboard() {
+  if (LS.get('khatm_onboard', 0)) return;
+  LS.set('khatm_onboard', 1);
+  const okN = await onbAsk('🔔', tl('السماح بالإشعارات'), tl('هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.'), tl('نعم، أسمح'), tl('ليس الآن'));
+  if (okN) {
+    st.pray.notif = true; save();
+    try { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); } catch (e) {}
+    try { if (isStandalone() && 'Notification' in window && Notification.permission === 'granted') await enablePush(); } catch (e) {}
+  }
+  const okL = await onbAsk('📍', tl('السماح بالموقع'), tl('هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟'), tl('نعم، أسمح'), tl('لا، سأختار مدينتي'));
+  if (okL) {
+    toast(tl('جاري تحديد الموقع…'));
+    const ok = await gpsForPrayer();
+    if (ok) { toast(tl('تم تحديد موقعك وأوقات الصلاة.')); if (curView === 'wird') renderWird(); }
+    else toast(gpsMsg());
+  }
+}
+go('wird');
+if (!LS.get('khatm_onboard', 0)) setTimeout(onboard, 600); else if (hasPartial()) askPartial();
 let nudgeT;
 document.addEventListener('visibilitychange', () => {
   clearTimeout(nudgeT);
