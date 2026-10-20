@@ -182,6 +182,8 @@ input[type=checkbox]{accent-color:var(--pri);width:20px;height:20px}
 #toast{background:var(--lapis);color:#fff6d6;border:1px solid var(--gold)}
 header #hdAcc{position:absolute;left:12px;top:56px;z-index:7;background:rgba(255,255,255,.12);color:var(--gold2);border:1.5px solid var(--gold);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.reg header #hdAcc{display:none}
+.hj{text-align:center;border:1.5px solid var(--gold)}.hjd{font-family:'Reem Kufi','Cairo',sans-serif;font-size:26px;font-weight:700;color:var(--pri)}.hjo{margin-top:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#f3d98b,#e6c06a);color:#3b2a05;font-weight:700;line-height:1.7}.hjn{margin-top:8px;font-size:14px;opacity:.85}
+
 </style>
 </head>
 <body>
@@ -361,6 +363,49 @@ function askPartial() {
 }
 function openPage(p) { st.last = p; save(); go('read'); }
 
+
+// ---------- التقويم الهجري والمناسبات ----------
+const HMON = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الثاني', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'شهر رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+const OCC = {
+  '1-1': ['رأس السنة الهجرية'], '1-10': ['يوم عاشوراء: استشهاد الإمام الحسين (ع)'],
+  '2-20': ['أربعينية الإمام الحسين (ع)'], '2-28': ['رحيل النبي محمد (ص) واستشهاد الإمام الحسن المجتبى (ع)'], '2-30': ['استشهاد الإمام الرضا (ع)'],
+  '3-1': ['هجرة النبي محمد (ص) من مكة إلى المدينة'], '3-8': ['استشهاد الإمام الحسن العسكري (ع)'], '3-9': ['بداية إمامة الإمام المهدي (عج)'], '3-12': ['مولد النبي محمد (ص) عند إخواننا السنة وبداية أسبوع الوحدة'], '3-17': ['مولد النبي محمد (ص) وولادة الإمام الصادق (ع)'],
+  '4-10': ['وفاة السيدة فاطمة المعصومة (ع)'], '4-11': ['ولادة الإمام الحسن العسكري (ع)'],
+  '5-5': ['ولادة السيدة زينب (ع)'],
+  '6-20': ['ولادة السيدة فاطمة الزهراء (ع)'],
+  '7-1': ['ولادة الإمام الباقر (ع)'], '7-3': ['استشهاد الإمام الهادي (ع)'], '7-10': ['ولادة الإمام الجواد (ع)'], '7-13': ['ولادة الإمام علي (ع)'], '7-15': ['وفاة السيدة زينب (ع)'], '7-25': ['استشهاد الإمام الكاظم (ع)'], '7-27': ['المبعث النبوي الشريف'],
+  '8-3': ['ولادة الإمام الحسين (ع)'], '8-4': ['ولادة أبي الفضل العباس (ع)'], '8-5': ['ولادة الإمام السجاد (ع)'], '8-15': ['ولادة الإمام المهدي (عج)'],
+  '9-1': ['أول شهر رمضان المبارك'], '9-10': ['وفاة السيدة خديجة الكبرى (ع)'], '9-15': ['ولادة الإمام الحسن المجتبى (ع)'], '9-19': ['ضربة الإمام علي (ع)'], '9-21': ['استشهاد الإمام علي (ع)'],
+  '10-1': ['عيد الفطر المبارك'], '10-25': ['استشهاد الإمام الصادق (ع)'],
+  '11-1': ['ولادة السيدة فاطمة المعصومة (ع)'], '11-11': ['ولادة الإمام الرضا (ع)'], '11-29': ['استشهاد الإمام الجواد (ع)'],
+  '12-9': ['يوم عرفة'], '12-10': ['عيد الأضحى المبارك'], '12-18': ['عيد الغدير الأغر']
+};
+function hijriOf(ms) {
+  try {
+    const f = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Asia/Baghdad' });
+    const o = {}; f.formatToParts(new Date(ms)).forEach(p => { o[p.type] = p.value; });
+    return { d: +o.day, m: +o.month, y: +String(o.year).replace(/\D/g, '') };
+  } catch (e) { return null; }
+}
+const hjAdj = () => (+st.hjAdj || 0);
+const hijriAt = off => hijriOf(Date.now() + (off + hjAdj()) * 86400000);
+const hjYr = y => st.lang === 'en' ? String(y) : String(y).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+const hjTxt = h => AR(h.d) + ' ' + tl(HMON[h.m - 1]) + ' ' + hjYr(h.y) + tl(' هـ');
+function occOf(h) { const a = OCC[h.m + '-' + h.d]; return a ? a.slice() : []; }
+function hijriCardHTML() {
+  const h = hijriAt(0); if (!h) return '';
+  const g = new Intl.DateTimeFormat(st.lang === 'en' ? 'en-GB' : 'ar-IQ-u-nu-arab', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Baghdad' }).format(new Date());
+  const oc = occOf(h);
+  let nx = '';
+  if (!oc.length) { for (let i = 1; i <= 90; i++) { const x = hijriAt(i); if (x && occOf(x).length) { nx = tl('المناسبة القادمة: ') + tl(occOf(x)[0]) + ' (' + hjTxt(x) + ' - ' + tl('بعد ') + AR(i) + tl(i === 1 ? ' يوم' : ' أيام') + ')'; break; } } }
+  const tm = hijriAt(1), tmo = tm ? occOf(tm) : [];
+  let h2 = '<div class="card hj"><div class="hjd">' + hjTxt(h) + '</div><div class="mut">' + esc(g) + '</div>';
+  if (oc.length) h2 += '<div class="hjo">✦ ' + oc.map(x => esc(tl(x))).join('<br>✦ ') + '</div>';
+  else if (nx) h2 += '<div class="hjn">' + esc(nx) + '</div>';
+  if (oc.length && tmo.length) h2 += '<div class="hjn">' + tl('غداً: ') + esc(tl(tmo[0])) + '</div>';
+  return h2 + '</div>';
+}
+
 // ---------- التنقل ----------
 let curView = 'wird';
 function go(v) {
@@ -448,7 +493,7 @@ function renderWird() {
     + (acts ? '<div class="mut" style="margin:10px 4px 2px"><b>' + tl('المستحبات:') + '</b><ul style="margin:6px 18px 0;padding:0;line-height:1.9">' + acts + '</ul></div>' : '')
     + '<button class="btn ghost" id="wZ">' + tl('كل الأيام والزيارات') + '</button></div>';
   const regc = st.profile ? '' : tl('<div class="card"><p class="mut">أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».</p><button class="btn ghost" id="wReg">إضافة اسمي</button></div>');
-  v.innerHTML = greet + prayCardHTML() + h + zi + regc + statsHTML();
+  v.innerHTML = greet + hijriCardHTML() + prayCardHTML() + h + zi + regc + statsHTML();
   if ($('pcard')) $('pcard').onclick = () => go('pray');
   if ($('wReg')) $('wReg').onclick = () => { regEdit = true; regFrom = 'wird'; go('reg'); };
   $('wZ').onclick = () => { duasTab = 'week'; go('duas'); };
@@ -1177,6 +1222,7 @@ async function renderSettings() {
   const th = [['light', tl('فاتح')], ['sepia', tl('ورقي')], ['dark', tl('ليلي')]];
   v.innerHTML =
     tl('<div class="card"><h2>حسابي</h2><div id="pf"></div>' + (st.profile ? '<button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button>' : '<p class="mut">لم تسجّل بعد. التسجيل اختياري.</p><button class="btn" id="pe">تسجيل الدخول / إنشاء حساب</button>') + '</div>') +
+    tl('<div class="card"><h2>التاريخ الهجري</h2><p class="mut">يعتمد بدء الأشهر على رؤية الهلال، فإذا اختلف التاريخ يوماً عندك عدّله هنا.</p><div class="row" style="justify-content:center;gap:14px"><button class="btn sm ghost" id="hjM">− يوم</button><b id="hjV"></b><button class="btn sm ghost" id="hjP">+ يوم</button></div></div>') +
     tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
     tl('<div class="card"><h2>المظهر</h2><div class="chips">') + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
     tl('<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="') + st.fs + '" style="width:100%"></div>' +
@@ -1198,6 +1244,10 @@ async function renderSettings() {
     });
   }
   $('pe').onclick = () => { regEdit = true; regFrom = 'set'; go('reg'); };
+  const hjShow = () => { const h = hijriAt(0); $('hjV').textContent = (h ? hjTxt(h) : '') + (hjAdj() ? '  (' + (hjAdj() > 0 ? '+' : '') + AR(hjAdj()) + ')' : ''); };
+  hjShow();
+  $('hjM').onclick = () => { st.hjAdj = Math.max(-2, hjAdj() - 1); save(); hjShow(); };
+  $('hjP').onclick = () => { st.hjAdj = Math.min(2, hjAdj() + 1); save(); hjShow(); };
   if ($('pd')) $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { st.profile = null; save(); regEdit = false; go('wird'); } };
   v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
