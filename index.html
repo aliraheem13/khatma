@@ -1120,7 +1120,7 @@ function renderPray(keepScroll) {
   h += '<div class="card"><h2>' + PT('الأذان', 'Adhan') + '</h2>';
   PADH.forEach(k => { h += '<div class="row"><span>' + PT('أذان ', 'Adhan: ') + pname(k) + '</span><input type="checkbox" data-adh="' + k + '"' + (st.pray.adhan[k] ? ' checked' : '') + '></div>'; });
   h += '<div class="row"><span>' + PT('إشعار عند دخول الوقت', 'Notification at prayer time') + '</span><input type="checkbox" id="pnt"' + (st.pray.notif ? ' checked' : '') + '></div>';
-  h += '<p class="mut" id="pas"></p><input type="file" id="adf" accept="audio/*" hidden><button class="btn gold" id="adc">' + PT('اختيار ملف الأذان من جوالك', 'Choose an adhan audio file') + '</button><button class="btn ghost" id="adt">' + PT('🔊 تجربة الأذان', '🔊 Test adhan') + '</button><button class="btn ghost" id="adx">' + PT('🩺 فحص الأذان', '🩺 Check adhan') + '</button><button class="btn ghost" id="add" style="display:none">' + PT('حذف الملف المحفوظ', 'Remove saved file') + '</button>';
+  h += '<p class="mut" id="pas"></p><input type="file" id="adf" accept="audio/*" hidden><button class="btn gold" id="adc">' + PT('اختيار ملف الأذان من جوالك', 'Choose an adhan audio file') + '</button><button class="btn ghost" id="adt">' + PT('🔊 تجربة الأذان', '🔊 Test adhan') + '</button><button class="btn ghost" id="add" style="display:none">' + PT('حذف الملف المحفوظ', 'Remove saved file') + '</button>';
   h += '<p class="note">' + PT('يُسمع الأذان عند دخول الوقت والتطبيق مفتوح على الشاشة (على الآيفون: افتح التطبيق المثبّت واتركه مفتوحاً وارفع الصوت). المتصفحات تمنع تشغيل الصوت والتطبيق مغلق أو الجوال مقفلاً.', 'The adhan plays at prayer time while the app is open on screen (iPhone: keep the installed app open and turn the volume up). Browsers do not allow sound while the app is closed or the phone is locked.') + '</p></div>';
   // القبلة
   h += '<div class="card center"><h2>' + PT('القبلة', 'Qibla') + '</h2>';
@@ -1167,21 +1167,7 @@ function renderPray(keepScroll) {
     try { await audSet(f); LS.set('khatm_adhan_name', f.name); toast(PT('تم حفظ الأذان ✓', 'Adhan saved ✓')); renderPray(); } catch (x) { toast(PT('تعذّر حفظ الملف.', 'Could not save the file.')); }
   };
   $('adt').onclick = () => { unlockAudio(); playAdhan('dhuhr', true); };
-  $('adx').onclick = async () => {
-    const L = [];
-    const ok = x => x ? '✅' : '❌';
-    L.push(ok(isStandalone()) + ' ' + PT('التطبيق مثبّت ومفتوح من الشاشة الرئيسية', 'Installed and opened from the home screen'));
-    L.push(ok('Notification' in window && Notification.permission === 'granted') + ' ' + PT('إذن الإشعارات', 'Notification permission') + ': ' + ('Notification' in window ? Notification.permission : PT('غير مدعوم', 'unsupported')));
-    L.push(ok(PADH.some(k => st.pray.adhan[k])) + ' ' + PT('أذان مفعّل للصلوات', 'Adhan enabled'));
-    let fileOK = false, fl = '';
-    try { const b = await audGet(); if (b) { fileOK = true; fl = PT('ملف من جوالك', 'file from your phone'); } } catch (e) {}
-    if (!fileOK) { try { const r = await fetch('adhan.mp3?v=2', { method: 'HEAD', cache: 'no-store' }); fileOK = r.ok; fl = r.ok ? PT('ملف الموقع adhan.mp3', 'site file adhan.mp3') : PT('adhan.mp3 غير موجود على الموقع (ارفعه على GitHub)', 'adhan.mp3 not found on the site (upload it to GitHub)') + ' [' + r.status + ']'; } catch (e) { fl = PT('تعذّر فحص الملف (لا إنترنت؟)', 'could not check the file (offline?)'); } }
-    L.push(ok(fileOK) + ' ' + PT('صوت الأذان', 'Adhan audio') + ': ' + fl);
-    const nx = pEvents(Date.now()).find(e => PADH.includes(e.k) && st.pray.adhan[e.k] && e.t > Date.now());
-    if (nx) L.push('⏰ ' + PT('أقرب أذان: ', 'Next adhan: ') + pname(nx.k) + ' ' + pFmt(nx.t, pcity().tz));
-    L.push(PT('تذكير: لا يُسمع الأذان إلا والتطبيق مفتوح على الشاشة وقت الصلاة.', 'Reminder: the adhan only plays while the app is open on screen at prayer time.'));
-    alert(L.join('\n'));
-  };
+
   $('add').onclick = async () => { await audSet(null); LS.set('khatm_adhan_name', ''); renderPray(); };
   audGet().then(b => {
     const s = $('pas'); if (!s) return;
@@ -1233,11 +1219,27 @@ async function downloadAll() {
   btn.disabled = false;
   $('dls').textContent = fail ? tl('تعذر تحميل ') + AR(fail) + tl(' صفحة، أعد المحاولة.') : tl('تم تحميل المصحف كاملاً ✓');
 }
+async function adhanCheck() {
+    const L = [];
+    const ok = x => x ? '✅' : '❌';
+    L.push(ok(isStandalone()) + ' ' + PT('التطبيق مثبّت ومفتوح من الشاشة الرئيسية', 'Installed and opened from the home screen'));
+    L.push(ok('Notification' in window && Notification.permission === 'granted') + ' ' + PT('إذن الإشعارات', 'Notification permission') + ': ' + ('Notification' in window ? Notification.permission : PT('غير مدعوم', 'unsupported')));
+    L.push(ok(PADH.some(k => st.pray.adhan[k])) + ' ' + PT('أذان مفعّل للصلوات', 'Adhan enabled'));
+    let fileOK = false, fl = '';
+    try { const b = await audGet(); if (b) { fileOK = true; fl = PT('ملف من جوالك', 'file from your phone'); } } catch (e) {}
+    if (!fileOK) { try { const r = await fetch('adhan.mp3?v=2', { method: 'HEAD', cache: 'no-store' }); fileOK = r.ok; fl = r.ok ? PT('ملف الموقع adhan.mp3', 'site file adhan.mp3') : PT('adhan.mp3 غير موجود على الموقع (ارفعه على GitHub)', 'adhan.mp3 not found on the site (upload it to GitHub)') + ' [' + r.status + ']'; } catch (e) { fl = PT('تعذّر فحص الملف (لا إنترنت؟)', 'could not check the file (offline?)'); } }
+    L.push(ok(fileOK) + ' ' + PT('صوت الأذان', 'Adhan audio') + ': ' + fl);
+    const nx = pEvents(Date.now()).find(e => PADH.includes(e.k) && st.pray.adhan[e.k] && e.t > Date.now());
+    if (nx) L.push('⏰ ' + PT('أقرب أذان: ', 'Next adhan: ') + pname(nx.k) + ' ' + pFmt(nx.t, pcity().tz));
+    L.push(PT('تذكير: لا يُسمع الأذان إلا والتطبيق مفتوح على الشاشة وقت الصلاة.', 'Reminder: the adhan only plays while the app is open on screen at prayer time.'));
+    alert(L.join('\n'));
+}
 async function renderSettings() {
   const v = $('v-set');
   const th = [['light', tl('فاتح')], ['sepia', tl('ورقي')], ['dark', tl('ليلي')]];
   v.innerHTML =
     tl('<div class="card"><h2>حسابي</h2><div id="pf"></div>' + (st.profile ? '<button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button>' : '<p class="mut">لم تسجّل بعد. التسجيل اختياري.</p><button class="btn" id="pe">تسجيل الدخول / إنشاء حساب</button>') + '</div>') +
+    '<div class="card"><h2>' + PT('فحص الأذان', 'Adhan check') + '</h2><p class="mut">' + PT('يفحص إذن الإشعارات وملف صوت الأذان وأقرب وقت أذان.', 'Checks notification permission, the adhan audio file and the next adhan time.') + '</p><button class="btn ghost" id="adx">' + PT('🩺 فحص الأذان', '🩺 Check adhan') + '</button></div>' +
     tl('<div class="card"><h2>التاريخ الهجري</h2><p class="mut">يعتمد بدء الأشهر على رؤية الهلال، فإذا اختلف التاريخ يوماً عندك عدّله هنا.</p><div class="row" style="justify-content:center;gap:14px"><button class="btn sm ghost" id="hjM">− يوم</button><b id="hjV"></b><button class="btn sm ghost" id="hjP">+ يوم</button></div></div>') +
     tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
     tl('<div class="card"><h2>المظهر</h2><div class="chips">') + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
@@ -1260,6 +1262,7 @@ async function renderSettings() {
     });
   }
   $('pe').onclick = () => { regEdit = true; regFrom = 'set'; go('reg'); };
+  $('adx').onclick = adhanCheck;
   const hjShow = () => { const h = hijriAt(0); $('hjV').textContent = (h ? hjTxt(h) : '') + (hjAdj() ? '  (' + (hjAdj() > 0 ? '+' : '') + AR(hjAdj()) + ')' : ''); };
   hjShow();
   $('hjM').onclick = () => { st.hjAdj = Math.max(-2, hjAdj() - 1); save(); hjShow(); };
@@ -1707,6 +1710,7 @@ async function onboard() {
   if (okN) {
     st.pray.notif = true; save();
     try { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); } catch (e) {}
+    if ('Notification' in window && Notification.permission === 'granted') { st.remind.on = true; save(); try { pushSyncSoon(); } catch (e) {} }
     try { if (isStandalone() && 'Notification' in window && Notification.permission === 'granted') await enablePush(); } catch (e) {}
   }
   const okL = await onbAsk('📍', tl('السماح بالموقع'), tl('هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟'), tl('نعم، أسمح'), tl('لا، سأختار مدينتي'));
@@ -1718,6 +1722,7 @@ async function onboard() {
   }
 }
 go('wird');
+try { if ('Notification' in window && Notification.permission === 'granted' && !LS.get('khatm_remind_auto', 0)) { LS.set('khatm_remind_auto', 1); st.remind.on = true; save(); pushSyncSoon(); } } catch (e) {}
 if (!LS.get('khatm_onboard', 0)) setTimeout(onboard, 600); else if (hasPartial()) askPartial();
 let nudgeT;
 document.addEventListener('visibilitychange', () => {
