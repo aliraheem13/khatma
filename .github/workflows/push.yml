@@ -1,11 +1,15 @@
 name: reminders
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
+concurrency:
+  group: khatma-push
+  cancel-in-progress: false
 jobs:
   send:
     runs-on: ubuntu-latest
+    timeout-minutes: 58
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -15,3 +19,4 @@ jobs:
       - run: python push.py
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+        
