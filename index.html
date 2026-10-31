@@ -981,17 +981,17 @@ async function adhanNotify(k) {
     reg.showNotification(PT('حان وقت أذان ', 'Adhan time: ') + PT(PN[k][0], PN[k][1]), { body: pcity().name, icon: 'icon-192.png', tag: 'khatma-adhan', renotify: true, dir: 'auto', lang: st.lang === 'en' ? 'en' : 'ar' });
   } catch (e) {}
 }
-function prayTick() {
+function prayTick(late) {
   const now = Date.now();
   try {
     const fired = LS.get('khatm_adhan_fired', {});
     pEvents(now).forEach(e => {
       if (!PADH.includes(e.k) || !st.pray.adhan[e.k]) return;
       const id = e.ymd + '|' + e.k;
-      if (now >= e.t && now - e.t < 180000 && !fired[id]) {
+      if (now >= e.t && now - e.t < (late === true ? 25 * 60000 : 180000) && !fired[id]) {
         fired[id] = 1; const ks = Object.keys(fired); while (ks.length > 12) delete fired[ks.shift()];
         LS.set('khatm_adhan_fired', fired);
-        playAdhan(e.k, false); adhanNotify(e.k); buzz([300, 100, 300]);
+        playAdhan(e.k, false); if (late !== true) adhanNotify(e.k); buzz([300, 100, 300]);
       }
     });
     const n = pNext(now);
@@ -1001,7 +1001,8 @@ function prayTick() {
   } catch (e) {}
 }
 setInterval(prayTick, 1000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) prayTick(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) prayTick(true); });
+setTimeout(() => prayTick(true), 1500);
 
 // ---------- البوصلة ----------
 const cmp = { on: false, sx: 0, sy: 0, n: 0, mag: null, acc: null, tilt: 0, last: 0 };
