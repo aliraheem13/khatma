@@ -601,8 +601,8 @@ function checkRemind() {
   if (!st.remind.on || !st.plan || st.todayDone || st.done >= TOTAL) return;
   const n = new Date();
   const hm = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
-  if (hm < st.remind.time || st.notifDate === today()) return;
-  st.notifDate = today(); save();
+  if (hm < st.remind.time || hm > '23:30' || Date.now() - (st.notifTs || 0) < 30 * 60 * 1000) return;
+  st.notifDate = today(); st.notifTs = Date.now(); save();
   toast(reminderMsg().replace('\n', ' — '));
   notify(reminderMsg(), 'khatma-wird');
 }
@@ -644,7 +644,11 @@ function fbInit() {
 const pushState = { get: () => LS.get('khatm_push', null), set: o => LS.set('khatm_push', o) };
 function pushPayload() {
   const live = st.remind.on && st.plan && st.done < TOTAL;
-  return { time: st.remind.time, tz: -new Date().getTimezoneOffset(), on: !!live, doneDate: st.todayDone ? today() : '', msg: live ? reminderMsg().slice(0, 250) : '', title: '🕌 ' + tl('ختمة'), lang: st.lang };
+  let pr = [];
+  try {
+    if (st.pray && st.pray.notif) { const now = Date.now(), c = pcity(); [0, 1, 2, 3].forEach(o => { const d = pDay(o, now); PADH.forEach(k => { if (st.pray.adhan[k] && isFinite(d.t[k]) && d.t[k] > now - 3600000) pr.push(Math.round(d.t[k] / 1000) + '|' + k); }); }); }
+  } catch (e) { pr = []; }
+  return { pray: pr, pcity: (function () { try { return pcity().name || ''; } catch (e) { return ''; } })(), time: st.remind.time, tz: -new Date().getTimezoneOffset(), on: !!live, doneDate: st.todayDone ? today() : '', msg: live ? reminderMsg().slice(0, 250) : '', title: '🕌 ' + tl('ختمة'), lang: st.lang };
 }
 async function pushWrite(force) {
   const ps = pushState.get(); if (!ps || !ps.token) return;
