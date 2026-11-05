@@ -664,6 +664,19 @@ function pushSyncSoon() {
   clearTimeout(pushTimer);
   pushTimer = setTimeout(() => { pushWrite(false).catch(() => {}); }, 3000);
 }
+async function swActive(ms) {
+  let reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) reg = await navigator.serviceWorker.register('sw.js');
+  if (reg.active) return reg;
+  const w = reg.installing || reg.waiting;
+  if (!w) throw new Error(tl('لا يوجد ملف خدمة نشط'));
+  await new Promise((res, rej) => {
+    const t = setTimeout(() => rej(new Error(tl('ملف الخدمة عالق في الحالة: ') + w.state)), ms);
+    const chk = () => { if (w.state === 'activated') { clearTimeout(t); res(); } else if (w.state === 'redundant') { clearTimeout(t); rej(new Error(tl('فشل تثبيت ملف الخدمة'))); } };
+    w.addEventListener('statechange', chk); chk();
+  });
+  return (await navigator.serviceWorker.getRegistration()) || reg;
+}
 const withTO = (p, ms, label) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj(new Error(label)), ms))]);
 async function enablePush(step) {
   step = step || (() => {});
@@ -676,9 +689,18 @@ async function enablePush(step) {
   step(tl('٢/٤ تحميل خدمة الإشعارات (تحتاج إنترنت)…'));
   await withTO(fbInit(), 20000, tl('تعذّر تحميل خدمة Firebase. تأكد من الإنترنت أو جرّب شبكة أخرى'));
   step(tl('٣/٤ تجهيز التطبيق…'));
-  let reg = await navigator.serviceWorker.getRegistration();
-  if (!reg) reg = await withTO(navigator.serviceWorker.register('sw.js'), 10000, tl('تعذّر تسجيل ملف الخدمة sw.js'));
-  reg = await withTO(navigator.serviceWorker.ready, 15000, tl('ملف الخدمة sw.js غير جاهز. أغلق التطبيق وافتحه ثم أعد المحاولة'));
+  let reg = null;
+  try { reg = await swActive(12000); } catch (e1) {
+    step(tl('٣/٤ إصلاح ملف الخدمة…'));
+    // إصلاح: حذف التسجيلات والذاكرة القديمة ثم التسجيل من جديد
+    try { (await navigator.serviceWorker.getRegistrations()).forEach(r => r.unregister()); } catch (e) {}
+    try { (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {}
+    const bad = [];
+    for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']) { try { const r = await fetch(f, { cache: 'no-store' }); if (!r.ok) bad.push(f + ' (' + r.status + ')'); } catch (e) { bad.push(f); } }
+    if (bad.length) throw new Error(tl('ملفات ناقصة على الموقع: ') + bad.join('، ') + tl(' — ارفعها على GitHub'));
+    try { await navigator.serviceWorker.register('sw.js'); reg = await swActive(25000); }
+    catch (e2) { throw new Error(tl('ملف الخدمة sw.js لا يشتغل: ') + (e2 && e2.message ? e2.message : e2) + tl(' — احذف أيقونة التطبيق وأضفه من جديد من Safari')); }
+  }
   step(tl('٤/٤ تسجيل الجهاز…'));
   const token = await withTO(firebase.messaging().getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg }), 25000, tl('انتهت مهلة الحصول على رمز الإشعارات'));
   if (!token) throw new Error(tl('لم يتم إنشاء رمز الإشعارات'));
