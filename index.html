@@ -1252,8 +1252,8 @@ async function renderSettings() {
     tl('<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ') + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
     tl('<label class="mut">وقت التذكير</label><input id="rt" type="time" value="') + st.remind.time + '">' +
     tl('<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>') +
-    tl('<p class="note" id="pushs"></p>') +
     tl('<p class="note">التنبيه داخل الموقع يعمل فقط والصفحة مفتوحة. للتذكير المضمون حتى والتطبيق مغلق، أضف التذكير إلى تقويم جوالك بالزر أعلاه.</p></div>') +
+    '<div class="card"><h2>' + PT('الإشعارات الحقيقية', 'Real notifications') + '</h2><p class="mut">' + PT('تصلك تذكيرات القراءة وإشعارات الصلاة حتى والتطبيق مغلق.', 'Get reading reminders and prayer alerts even when the app is closed.') + '</p><div id="pushs" class="row" style="font-weight:700"></div><button class="btn" id="pushb"></button></div>' +
     tl('<div class="card"><h2>القراءة بدون إنترنت</h2><p class="mut" id="dls">جاري الفحص…</p><button class="btn" id="dl">تحميل المصحف كاملاً</button></div>') +
     tl('<div class="card"><h2>الختمة</h2><button class="btn ghost" id="cp2">تغيير عدد الصفحات اليومية</button><button class="btn ghost" id="rs">إعادة تعيين التقدم</button></div>') +
     tl('<div class="card"><p class="note">النص القرآني برواية حفص عن عاصم بالرسم العثماني، يُجلب من واجهة alquran.cloud ويُعرض كما هو دون تعديل. ننصح دائماً بمراجعة المصحف المطبوع للتأكد.</p></div>');
@@ -1283,6 +1283,27 @@ async function renderSettings() {
   $('rt').onchange = () => { if ($('rt').value) { st.remind.time = $('rt').value; st.notifDate = ''; save(); } };
   $('ics').onclick = downloadICS;
   $('pushs').textContent = (pushState.get() && pushState.get().token) ? tl('الإشعارات الحقيقية مفعّلة على هذا الجهاز ✓ (تصلك حتى والتطبيق مغلق)') : tl('الإشعارات الحقيقية: تتفعّل تلقائياً عند السماح بالإشعارات. على الآيفون ثبّت التطبيق على الشاشة الرئيسية وافتحه من أيقونته.');
+  const pushRefresh = () => {
+    const on = !!(pushState.get() && pushState.get().token) && 'Notification' in window && Notification.permission === 'granted';
+    $('pushs').textContent = on ? tl('✅ مفعّلة على هذا الجهاز') : tl('❌ غير مفعّلة');
+    $('pushs').style.color = on ? '#1e8e5a' : '#c0392b';
+    $('pushb').textContent = on ? tl('إعادة التفعيل') : tl('تفعيل الإشعارات الحقيقية');
+    $('pushb').className = on ? 'btn ghost' : 'btn';
+  };
+  pushRefresh();
+  $('pushb').onclick = async () => {
+    const b = $('pushb'), out = $('pushs'), bad = t => { out.textContent = '⚠️ ' + t; out.style.color = '#c0392b'; };
+    b.disabled = true; b.textContent = tl('جاري التفعيل…');
+    try {
+      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) bad(tl('المتصفح لا يدعم الإشعارات. على الآيفون ثبّت التطبيق على الشاشة الرئيسية وافتحه من أيقونته.'));
+      else if (!isStandalone()) bad(tl('افتح التطبيق من أيقونته على الشاشة الرئيسية وليس من Safari.'));
+      else if (Notification.permission === 'denied') bad(tl('الإشعارات مرفوضة. فعّلها من الإعدادات ← الإشعارات ← ختمة.'));
+      else if (!navigator.onLine) bad(tl('لا يوجد إنترنت. اتصل ثم أعد المحاولة.'));
+      else if (await enablePush()) { st.remind.on = true; save(); const rm = $('rm'); if (rm) rm.checked = true; toast(tl('تم تفعيل الإشعارات ✓')); pushRefresh(); b.disabled = false; return; }
+      else bad(tl('لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.'));
+    } catch (e) { bad(tl('تعذر التفعيل: ') + (e && e.message ? e.message : e)); }
+    b.disabled = false; b.textContent = tl('تفعيل الإشعارات الحقيقية');
+  };
   $('dl').onclick = downloadAll;
   $('cp2').onclick = () => { selPages = ppd() || 5; st.plan = null; save(); go('wird'); };
   $('rs').onclick = () => { if (confirm(tl('سيتم مسح تقدمك في الختمة الحالية. هل أنت متأكد؟'))) { st.done = 0; st.todayStart = 0; st.todayRead = 0; st.todayDone = false; st.todayDeferred = false; st.streak = 0; st.lastDate = ''; save(); go('wird'); } };
