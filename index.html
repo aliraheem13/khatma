@@ -664,20 +664,28 @@ function pushSyncSoon() {
   clearTimeout(pushTimer);
   pushTimer = setTimeout(() => { pushWrite(false).catch(() => {}); }, 3000);
 }
-async function enablePush() {
+const withTO = (p, ms, label) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj(new Error(label)), ms))]);
+async function enablePush(step) {
+  step = step || (() => {});
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window) || !isStandalone()) {
     toast(tl('ثبّت التطبيق على الشاشة الرئيسية أولاً (مشاركة ← إضافة إلى الشاشة الرئيسية) ثم افتحه من هناك.')); return false;
   }
-  const perm = await Notification.requestPermission();
+  step(tl('١/٤ طلب إذن الإشعارات…'));
+  const perm = await withTO(Notification.requestPermission(), 60000, tl('لم تظهر نافذة الإذن'));
   if (perm !== 'granted') { toast(tl('لم يُسمح بالإشعارات. فعّلها من إعدادات الجوال.')); return false; }
-  await fbInit();
-  const reg = await navigator.serviceWorker.ready;
-  const token = await Promise.race([firebase.messaging().getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg }), new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 25000))]);
-  if (!token) throw new Error('no token');
+  step(tl('٢/٤ تحميل خدمة الإشعارات (تحتاج إنترنت)…'));
+  await withTO(fbInit(), 20000, tl('تعذّر تحميل خدمة Firebase. تأكد من الإنترنت أو جرّب شبكة أخرى'));
+  step(tl('٣/٤ تجهيز التطبيق…'));
+  let reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) reg = await withTO(navigator.serviceWorker.register('sw.js'), 10000, tl('تعذّر تسجيل ملف الخدمة sw.js'));
+  reg = await withTO(navigator.serviceWorker.ready, 15000, tl('ملف الخدمة sw.js غير جاهز. أغلق التطبيق وافتحه ثم أعد المحاولة'));
+  step(tl('٤/٤ تسجيل الجهاز…'));
+  const token = await withTO(firebase.messaging().getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg }), 25000, tl('انتهت مهلة الحصول على رمز الإشعارات'));
+  if (!token) throw new Error(tl('لم يتم إنشاء رمز الإشعارات'));
   const ps = pushState.get() || {};
   if (!ps.id) ps.id = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   ps.token = token; ps.last = ''; pushState.set(ps);
-  await pushWrite(true);
+  try { await withTO(pushWrite(true), 15000, 'write'); } catch (e) { /* يُعاد الحفظ لاحقاً تلقائياً */ ps.last = ''; pushState.set(ps); pushSyncSoon(); }
   return true;
 }
 
@@ -1299,7 +1307,7 @@ async function renderSettings() {
       else if (!isStandalone()) bad(tl('افتح التطبيق من أيقونته على الشاشة الرئيسية وليس من Safari.'));
       else if (Notification.permission === 'denied') bad(tl('الإشعارات مرفوضة. فعّلها من الإعدادات ← الإشعارات ← ختمة.'));
       else if (!navigator.onLine) bad(tl('لا يوجد إنترنت. اتصل ثم أعد المحاولة.'));
-      else if (await enablePush()) { st.remind.on = true; save(); const rm = $('rm'); if (rm) rm.checked = true; toast(tl('تم تفعيل الإشعارات ✓')); pushRefresh(); b.disabled = false; return; }
+      else if (await enablePush(t => { out.textContent = t; out.style.color = ''; })) { st.remind.on = true; save(); const rm = $('rm'); if (rm) rm.checked = true; toast(tl('تم تفعيل الإشعارات ✓')); pushRefresh(); b.disabled = false; return; }
       else bad(tl('لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.'));
     } catch (e) { bad(tl('تعذر التفعيل: ') + (e && e.message ? e.message : e)); }
     b.disabled = false; b.textContent = tl('تفعيل الإشعارات الحقيقية');
