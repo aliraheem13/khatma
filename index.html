@@ -242,7 +242,7 @@ let st = Object.assign({}, DEF, LS.get('khatm_state', {}));
 st.remind = Object.assign({}, DEF.remind, st.remind || {});
 st.tsb = Object.assign({}, DEF.tsb, st.tsb || {});
 if (st.todayRead < st.todayStart) st.todayRead = st.todayStart;
-const save = () => { LS.set('khatm_state', st); if (typeof pushSyncSoon === 'function') pushSyncSoon(); };
+const save = () => { LS.set('khatm_state', st); if (typeof acctSync === 'function') acctSync(); if (typeof pushSyncSoon === 'function') pushSyncSoon(); };
 
 // ---------- التاريخ ----------
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -1273,7 +1273,7 @@ async function renderSettings() {
   const v = $('v-set');
   const th = [['light', tl('فاتح')], ['sepia', tl('ورقي')], ['dark', tl('ليلي')]];
   v.innerHTML =
-    tl('<div class="card"><h2>حسابي</h2><div id="pf"></div>' + (st.profile ? '<button class="btn ghost" id="pe">تعديل بياناتي</button><button class="btn ghost" id="pd">حذف حسابي</button>' : '<p class="mut">لم تسجّل بعد. التسجيل اختياري.</p><button class="btn" id="pe">تسجيل الدخول / إنشاء حساب</button>') + '</div>') +
+    tl('<div class="card"><h2>حسابي</h2><div id="pf"></div>' + (st.profile ? '<button class="btn ghost" id="pe">تعديل بياناتي</button>' + (st.acct ? '<button class="btn ghost" id="plo">تسجيل الخروج</button>' : '') + '<button class="btn ghost" id="pd">حذف حسابي</button>' : '<p class="mut">لم تسجّل بعد. التسجيل اختياري.</p><button class="btn" id="pe">تسجيل الدخول / إنشاء حساب</button>') + '</div>') +
     '<div class="card"><h2>' + PT('فحص الأذان', 'Adhan check') + '</h2><p class="mut">' + PT('يفحص إذن الإشعارات وملف صوت الأذان وأقرب وقت أذان.', 'Checks notification permission, the adhan audio file and the next adhan time.') + '</p><button class="btn ghost" id="adx">' + PT('🩺 فحص الأذان', '🩺 Check adhan') + '</button></div>' +
     tl('<div class="card"><h2>التاريخ الهجري</h2><p class="mut">يعتمد بدء الأشهر على رؤية الهلال، فإذا اختلف التاريخ يوماً عندك عدّله هنا.</p><div class="row" style="justify-content:center;gap:14px"><button class="btn sm ghost" id="hjM">− يوم</button><b id="hjV"></b><button class="btn sm ghost" id="hjP">+ يوم</button></div></div>') +
     tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
@@ -1296,13 +1296,14 @@ async function renderSettings() {
       d.appendChild(a); d.appendChild(b); pf.appendChild(d);
     });
   }
-  $('pe').onclick = () => { regEdit = true; regFrom = 'set'; go('reg'); };
+  $('pe').onclick = () => { regEdit = !!st.profile; regMode = 'login'; regFrom = 'set'; go('reg'); };
   $('adx').onclick = adhanCheck;
   const hjShow = () => { const h = hijriAt(0); $('hjV').textContent = (h ? hjTxt(h) : '') + (hjAdj() ? '  (' + (hjAdj() > 0 ? '+' : '') + AR(hjAdj()) + ')' : ''); };
   hjShow();
   $('hjM').onclick = () => { st.hjAdj = Math.max(-2, hjAdj() - 1); save(); hjShow(); };
   $('hjP').onclick = () => { st.hjAdj = Math.min(2, hjAdj() + 1); save(); hjShow(); };
-  if ($('pd')) $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { st.profile = null; save(); regEdit = false; go('wird'); } };
+  if ($('pd')) $('pd').onclick = () => { if (confirm(tl('سيتم حذف بيانات حسابك من هذا الجهاز. هل أنت متأكد؟'))) { if (st.acct) { const A = accts(); delete A[st.acct]; LS.set('khatm_accts', A); st.acct = null; } st.profile = null; save(); regEdit = false; go('wird'); } };
+  if ($('plo')) $('plo').onclick = () => { if (confirm(tl('تسجيل الخروج؟ تقدّمك محفوظ في حسابك وتعود إليه عند الدخول.'))) { acctSync(); st.acct = null; st.profile = null; resetProg(); save(); regEdit = false; regMode = 'login'; go('wird'); } };
   v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
   $('fs').oninput = () => { st.fs = +$('fs').value; save(); applyLook(); };
@@ -1357,11 +1358,67 @@ let regFrom = 'set';
 function updAcc() {
   const b = $('hdAcc'); if (!b) return;
   b.textContent = st.profile && st.profile.name ? '👤 ' + st.profile.name : tl('تسجيل الدخول');
-  b.onclick = () => { regEdit = true; regFrom = (curView === 'reg' ? 'wird' : curView); go('reg'); };
+  b.onclick = () => { regEdit = !!st.profile; regMode = 'login'; regFrom = (curView === 'reg' ? 'wird' : curView); go('reg'); };
 }
+// ----- حسابات محلية (على هذا الجهاز) -----
+const PROG_KEYS = ['plan', 'done', 'todayDate', 'todayStart', 'todayDone', 'todayRead', 'todayDeferred', 'streak', 'lastDate', 'khatmat', 'last'];
+const accts = () => LS.get('khatm_accts', {});
+const normId = x => { x = String(x || '').trim(); if (x.indexOf('@') >= 0) return x.toLowerCase(); const d = x.replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : d; };
+function progSnap() { const o = {}; PROG_KEYS.forEach(k => { o[k] = st[k]; }); return o; }
+function acctSync() {
+  if (!st.acct) return;
+  const A = accts(); if (!A[st.acct]) return;
+  A[st.acct].prog = progSnap(); if (st.profile) A[st.acct].profile = st.profile;
+  LS.set('khatm_accts', A);
+}
+async function hashPw(pw, salt) {
+  try {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + '|' + pw));
+    return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+  } catch (e) { let h = 5381; const t = salt + '|' + pw; for (let k = 0; k < t.length; k++) h = ((h << 5) + h + t.charCodeAt(k)) | 0; return 'x' + h; }
+}
+const newSalt = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+function findAcct(idRaw) {
+  const id = normId(idRaw), A = accts();
+  if (A[id]) return id;
+  for (const k in A) { const p = A[k].profile || {}; if (normId(p.phone) === id || (p.email && normId(p.email) === id)) return k; }
+  return '';
+}
+function resetProg() { PROG_KEYS.forEach(k => { st[k] = Array.isArray(DEF[k]) ? DEF[k].slice() : DEF[k]; }); st.plan = null; st.streak = 0; }
+let regMode = 'login';
 function renderReg() {
   const v = $('v-reg'), p = Object.assign({}, st.profile || {}, regDraft || {}); regDraft = null;
-  v.innerHTML = '<div class="center"><img alt="" src="' + ICON + '" style="width:120px;height:120px;border-radius:26px;margin:6px 0 12px"></div>' + langRow() + '<div class="card"><h2>' + (regEdit ? tl('تعديل بياناتي') : tl('أهلاً بك في ختمة')) + '</h2>' +
+  const hasAcc = Object.keys(accts()).length > 0;
+  const head = '<div class="center"><img alt="" src="' + ICON + '" style="width:120px;height:120px;border-radius:26px;margin:6px 0 12px"></div>' + langRow();
+  if (!regEdit && regMode === 'login') {
+    v.innerHTML = head + '<div class="card"><h2>' + tl('تسجيل الدخول') + '</h2>' +
+      tl('<label class="mut">البريد الإلكتروني أو رقم الهاتف</label><input id="li" type="text" inputmode="email" autocomplete="username" dir="ltr" maxlength="80">') +
+      tl('<label class="mut">كلمة المرور</label><input id="lp" type="password" autocomplete="current-password" dir="ltr" maxlength="60">') +
+      '<p class="note" id="lerr" style="color:#c0392b"></p>' +
+      '<button class="btn" id="lgo">' + tl('تسجيل الدخول') + '</button>' +
+      tl('<button class="btn ghost" id="lnew">ليس لدي حساب، إنشاء حساب جديد</button><button class="btn ghost" id="lcn">إلغاء</button>') +
+      (hasAcc ? '' : tl('<p class="note">الحسابات تُحفظ على هذا الجهاز. إن لم تنشئ حساباً هنا من قبل فاختر «إنشاء حساب جديد».</p>')) + '</div>';
+    v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
+    $('lnew').onclick = () => { regMode = 'new'; renderReg(); };
+    $('lcn').onclick = () => { const f = regFrom; regFrom = 'set'; go(f === 'reg' ? 'wird' : f); };
+    $('lgo').onclick = async () => {
+      const idr = $('li').value.trim(), pw = $('lp').value, er = $('lerr');
+      if (!idr || !pw) { er.textContent = tl('اكتب البريد أو الهاتف وكلمة المرور'); return; }
+      const k = findAcct(idr), A = accts();
+      if (!k) { er.textContent = tl('لا يوجد حساب بهذه البيانات على هذا الجهاز'); return; }
+      const h = await hashPw(pw, A[k].salt);
+      if (h !== A[k].hash) { er.textContent = tl('كلمة المرور غير صحيحة'); return; }
+      st.acct = k; st.profile = A[k].profile;
+      const pr = A[k].prog;
+      if (pr && Number(pr.done) > 0) {
+        const keep = await onbAsk('📖', tl('أهلاً بعودتك'), tl('وصلت في قراءة القرآن إلى صفحة ') + AR(Math.min(TOTAL, Number(pr.done) + 1)) + tl('. هل تريد المتابعة من النقطة التي توقفت عندها أم البدء من الصفر؟'), tl('متابعة من حيث توقفت'), tl('البدء من الصفر'));
+        if (keep) { PROG_KEYS.forEach(x => { if (pr[x] !== undefined) st[x] = pr[x]; }); } else { resetProg(); }
+      }
+      save(); regMode = 'login'; regFrom = 'set'; go('wird');
+    };
+    return;
+  }
+  v.innerHTML = head + '<div class="card"><h2>' + (regEdit ? tl('تعديل بياناتي') : tl('إنشاء حساب جديد')) + '</h2>' +
     '<p class="mut">' + (regEdit ? tl('عدّل بياناتك ثم احفظ.') : tl('سجّل بياناتك لنبدأ.')) + tl(' تُحفظ على جهازك فقط ولا تُرسل لأي جهة.</p>') +
     tl('<label class="mut">الاسم *</label><input id="rn" type="text" maxlength="40" autocomplete="name">') +
     tl('<label class="mut">العمر *</label><input id="ra" type="number" min="5" max="110" inputmode="numeric">') +
@@ -1369,18 +1426,33 @@ function renderReg() {
     tl('<label class="mut">المنطقة / الحي</label><input id="rz" type="text" maxlength="40">') +
     tl('<label class="mut">رقم الهاتف (واتساب) *</label><input id="rp" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" placeholder="07701234567">') +
     tl('<label class="mut">البريد الإلكتروني (اختياري)</label><input id="re" type="email" inputmode="email" autocomplete="email" maxlength="80" dir="ltr">') +
+    (regEdit && st.acct ? tl('<label class="mut">كلمة مرور جديدة (اتركها فارغة لعدم التغيير)</label>') : regEdit ? tl('<label class="mut">كلمة المرور (لإنشاء حساب للدخول لاحقاً، اختياري)</label>') : tl('<label class="mut">كلمة المرور * (٦ أحرف على الأقل)</label>')) +
+    '<input id="rw" type="password" autocomplete="new-password" dir="ltr" maxlength="60">' +
     '<p class="note" id="rerr" style="color:#c0392b"></p>' +
-    '<button class="btn" id="rsv">' + (regEdit ? tl('حفظ') : tl('ابدأ')) + '</button>' + (regEdit ? tl('<button class="btn ghost" id="rcn">إلغاء</button>') : '') + '</div>';
+    '<button class="btn" id="rsv">' + (regEdit ? tl('حفظ') : tl('إنشاء الحساب')) + '</button>' +
+    (regEdit ? tl('<button class="btn ghost" id="rcn">إلغاء</button>') : tl('<button class="btn ghost" id="rlg">لدي حساب، تسجيل الدخول</button><button class="btn ghost" id="rcn">إلغاء</button>')) + '</div>';
   $('rn').value = p.name || ''; $('ra').value = p.age || ''; $('rg').value = p.gov || ''; $('rz').value = p.area || ''; $('rp').value = p.phone || ''; $('re').value = p.email || '';
   v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
-  $('rsv').onclick = () => {
+  if ($('rlg')) $('rlg').onclick = () => { regMode = 'login'; renderReg(); };
+  $('rsv').onclick = async () => {
     const np = { name: $('rn').value.trim(), age: $('ra').value.trim(), gov: $('rg').value, area: $('rz').value.trim(), phone: $('rp').value.trim(), email: $('re').value.trim() };
-    const err = validProfile(np);
+    const pw = $('rw').value;
+    let err = validProfile(np);
+    if (!err && pw && pw.length < 6) err = tl('كلمة المرور ٦ أحرف على الأقل');
+    if (!err && !regEdit && !pw) err = tl('اكتب كلمة المرور');
+    const A = accts(), id = normId(np.phone);
+    if (!err && (!regEdit || !st.acct) && pw && A[id]) err = tl('يوجد حساب بهذا الرقم، سجّل الدخول بدلاً من ذلك');
     if (err) { $('rerr').textContent = err; return; }
     np.age = Number(np.age);
-    st.profile = np; save(); regEdit = false; regFrom = 'set'; go('wird');
+    st.profile = np;
+    if (pw) {
+      if (st.acct && A[st.acct]) { const sl = newSalt(); A[st.acct].salt = sl; A[st.acct].hash = await hashPw(pw, sl); }
+      else { const sl = newSalt(); A[id] = { profile: np, salt: sl, hash: await hashPw(pw, sl), prog: progSnap() }; st.acct = id; }
+      LS.set('khatm_accts', A);
+    }
+    save(); regEdit = false; regMode = 'login'; regFrom = 'set'; go('wird');
   };
-  if ($('rcn')) $('rcn').onclick = () => { regEdit = false; const f = regFrom; regFrom = 'set'; go(f); };
+  $('rcn').onclick = () => { regEdit = false; regMode = 'login'; const f = regFrom; regFrom = 'set'; go(f === 'reg' ? 'wird' : f); };
 }
 
 // ---------- التسبيح والأذكار ----------
@@ -1689,7 +1761,7 @@ const LT = t => {
   return EN[t] !== undefined ? EN[t] : t;
 };
 Object.assign(EN, {'الصلاة': 'Prayer', 'دعاء الفرج': 'Dua al-Faraj', 'للدعاء بتعجيل الفرج': 'For the hastening of the relief', 'دعاء اليوم': 'Dua of the day', 'دعاء يوم السبت': 'Dua of Saturday', 'دعاء يوم الأحد': 'Dua of Sunday', 'دعاء يوم الاثنين': 'Dua of Monday', 'دعاء يوم الثلاثاء': 'Dua of Tuesday', 'دعاء يوم الأربعاء': 'Dua of Wednesday', 'دعاء يوم الخميس': 'Dua of Thursday', 'دعاء يوم الجمعة': 'Dua of Friday'});
-Object.assign(EN, {'لم تتفعّل الإشعارات الحقيقية تلقائياً. فعّلها من الإعدادات حتى يصلك التذكير وأوقات الأذان.':'Real notifications were not enabled automatically. Turn them on in Settings to get reminders and adhan times.','فتح الإعدادات':'Open settings'}); Object.assign(EN, {'جاري التفعيل…':'Enabling…','جاري التفعيل، انتظر قليلاً…':'Enabling, please wait…','تم التفعيل ✓ سيصلك التذكير والأذان حتى والتطبيق مغلق.':'Enabled ✓ You will get reminders and adhan alerts even when the app is closed.','لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.':'Not completed. Make sure you allowed notifications and try again.'}); Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.':'Location is not allowed. Turn on Location Services for the app (or Safari) in phone Settings and try again, or choose your city.','لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.':'Could not get your location now. Make sure Location Services/GPS is on and try somewhere open, or choose your city.','الموقع غير مدعوم على هذا الجهاز.':'Location is not supported on this device.','السماح بالإشعارات':'Allow notifications','هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.':'Allow Khatma to send you notifications? We use them for adhan alerts and your daily Quran reminder.','نعم، أسمح':'Yes, allow','ليس الآن':'Not now','السماح بالموقع':'Allow location','هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟':'Allow Khatma to use your location to set accurate prayer times and qibla for where you are?','لا، سأختار مدينتي':'No, I will choose my city','جاري تحديد الموقع…':'Locating…','تم تحديد موقعك وأوقات الصلاة.':'Location set. Prayer times updated.','تعذّر تحديد الموقع. يمكنك اختيار مدينتك من تبويب الصلاة.':'Could not get your location. You can choose your city in the Prayer tab.'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
+Object.assign(EN, {'تسجيل الدخول':'Log in','البريد الإلكتروني أو رقم الهاتف':'Email or phone number','كلمة المرور':'Password','اكتب البريد أو الهاتف وكلمة المرور':'Enter email/phone and password','لا يوجد حساب بهذه البيانات على هذا الجهاز':'No account with these details on this device','كلمة المرور غير صحيحة':'Wrong password','ليس لدي حساب، إنشاء حساب جديد':'No account? Create one','إلغاء':'Cancel','أهلاً بعودتك':'Welcome back','وصلت في قراءة القرآن إلى صفحة ':'You reached page ','. هل تريد المتابعة من النقطة التي توقفت عندها أم البدء من الصفر؟':'. Continue where you stopped or start over?','متابعة من حيث توقفت':'Continue where I stopped','البدء من الصفر':'Start from zero','إنشاء حساب جديد':'Create account','كلمة المرور * (٦ أحرف على الأقل)':'Password * (min 6 chars)','كلمة مرور جديدة (اتركها فارغة لعدم التغيير)':'New password (leave empty to keep)','كلمة المرور (لإنشاء حساب للدخول لاحقاً، اختياري)':'Password (optional, to log in later)','كلمة المرور ٦ أحرف على الأقل':'Password must be at least 6 characters','اكتب كلمة المرور':'Enter a password','يوجد حساب بهذا الرقم، سجّل الدخول بدلاً من ذلك':'An account with this number exists, log in instead','إنشاء الحساب':'Create account','لدي حساب، تسجيل الدخول':'I have an account, log in','تسجيل الخروج':'Log out','تسجيل الخروج؟ تقدّمك محفوظ في حسابك وتعود إليه عند الدخول.':'Log out? Your progress is saved in your account.','الحسابات تُحفظ على هذا الجهاز. إن لم تنشئ حساباً هنا من قبل فاختر «إنشاء حساب جديد».':'Accounts are stored on this device. If you have not created one here, choose Create account.'}); Object.assign(EN, {'لم تتفعّل الإشعارات الحقيقية تلقائياً. فعّلها من الإعدادات حتى يصلك التذكير وأوقات الأذان.':'Real notifications were not enabled automatically. Turn them on in Settings to get reminders and adhan times.','فتح الإعدادات':'Open settings'}); Object.assign(EN, {'جاري التفعيل…':'Enabling…','جاري التفعيل، انتظر قليلاً…':'Enabling, please wait…','تم التفعيل ✓ سيصلك التذكير والأذان حتى والتطبيق مغلق.':'Enabled ✓ You will get reminders and adhan alerts even when the app is closed.','لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.':'Not completed. Make sure you allowed notifications and try again.'}); Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.':'Location is not allowed. Turn on Location Services for the app (or Safari) in phone Settings and try again, or choose your city.','لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.':'Could not get your location now. Make sure Location Services/GPS is on and try somewhere open, or choose your city.','الموقع غير مدعوم على هذا الجهاز.':'Location is not supported on this device.','السماح بالإشعارات':'Allow notifications','هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.':'Allow Khatma to send you notifications? We use them for adhan alerts and your daily Quran reminder.','نعم، أسمح':'Yes, allow','ليس الآن':'Not now','السماح بالموقع':'Allow location','هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟':'Allow Khatma to use your location to set accurate prayer times and qibla for where you are?','لا، سأختار مدينتي':'No, I will choose my city','جاري تحديد الموقع…':'Locating…','تم تحديد موقعك وأوقات الصلاة.':'Location set. Prayer times updated.','تعذّر تحديد الموقع. يمكنك اختيار مدينتك من تبويب الصلاة.':'Could not get your location. You can choose your city in the Prayer tab.'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
 Object.assign(EN, {
   'مفعّلة على هذا الجهاز ✓': 'Enabled on this device ✓',
   'غير مفعّلة بعد. ثبّت التطبيق على الشاشة الرئيسية أولاً ثم اضغط الزر.': 'Not enabled yet. Install the app to your Home Screen first, then tap the button.',
