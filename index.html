@@ -197,12 +197,42 @@ body.reg header #hdAcc{display:none}
 .fb.on{background:var(--pri);color:#fff;border-color:var(--gold)}.fb.on small{color:#e9e2c8}
 .prev{margin:10px 0 2px;padding:14px;border-radius:14px;background:var(--bg);border:1px dashed var(--gsoft);text-align:center;line-height:2}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0}
+
+#book{position:fixed;inset:0;z-index:70;background:radial-gradient(ellipse at 50% 40%,#3b2a1c,#1e140c);display:none;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);font-family:var(--af)}
+#book.on{display:flex}
+.bk-top{display:flex;align-items:center;gap:10px;padding:8px 12px;color:#f3e2b8;font-size:calc(14px * var(--ui))}
+.bk-top button{background:rgba(255,255,255,.12);border:1px solid rgba(243,226,184,.5);color:#f3e2b8;border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+.bk-top .bt{flex:1;text-align:center;font-weight:700}
+.bk-stage{flex:1;position:relative;perspective:2200px;margin:0 10px;min-height:0;touch-action:pan-y}
+.bk-book{position:absolute;inset:0;direction:ltr;filter:drop-shadow(0 14px 22px rgba(0,0,0,.55))}
+.bk-half{position:absolute;top:0;bottom:0;width:50%;overflow:hidden}
+.bk-half.L{left:0;border-radius:10px 0 0 10px}.bk-half.R{right:0;border-radius:0 10px 10px 0}
+.bk-book.one .bk-half{width:100%;left:0;right:auto;border-radius:10px}
+.bk-pg{position:absolute;inset:0;direction:rtl;background:linear-gradient(180deg,var(--card),var(--bg));color:var(--txt);font-family:var(--qf);font-size:var(--bfs,20px);line-height:1.95;text-align:justify;padding:14px 18px 26px;overflow:hidden;border:1px solid var(--gsoft)}
+.bk-half.L .bk-pg,.bk-leaf .bk-pg.fl{box-shadow:inset -22px 0 26px -16px rgba(0,0,0,.35),inset 3px 0 5px -3px rgba(0,0,0,.2)}
+.bk-half.R .bk-pg,.bk-leaf .bk-pg.fr{box-shadow:inset 22px 0 26px -16px rgba(0,0,0,.35),inset -3px 0 5px -3px rgba(0,0,0,.2)}
+.bk-pg .sura{font-size:.85em;margin:6px 0 4px;padding:2px 6px}
+.bk-pg .bism{font-size:.9em;text-align:center;margin:2px 0}
+.bk-pg .ayat{margin:0}
+.bk-pg .num{font-size:.55em;min-width:1.7em;height:1.7em}
+.bk-pg .pn{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-family:var(--af);font-size:12px;color:var(--mut)}
+.bk-pg.ld{display:flex;align-items:center;justify-content:center;color:var(--mut);font-family:var(--af)}
+.bk-leaf{position:absolute;top:0;bottom:0;width:50%;transform-style:preserve-3d;transition:transform .85s cubic-bezier(.45,.05,.3,1);z-index:5}
+.bk-book.one .bk-leaf{width:100%}
+.bk-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.bk-face.back{transform:rotateY(180deg)}
+.bk-face:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(0,0,0,0) 55%);opacity:var(--sh,0);pointer-events:none}
+.bk-hint{padding:8px 14px 10px;text-align:center;color:#d9c79a;font-size:calc(13px * var(--ui));min-height:20px}
+.bk-hint button{background:var(--gold);border:0;color:#2a1c05;border-radius:999px;padding:8px 18px;font:inherit;font-weight:700;cursor:pointer;margin-inline-start:8px}
+.bk-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:8;width:34px;height:70px;border:0;border-radius:10px;background:rgba(0,0,0,.28);color:#f3e2b8;font-size:24px;cursor:pointer}
+.bk-nav.nl{left:2px}.bk-nav.nr{right:2px}
 </style>
 </head>
 <body>
 <header><button id="hdAcc" type="button" aria-label="الحساب"></button><div class="bsm" aria-hidden="true">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div><div class="brand"><img id="lg" alt="" style="width:34px;height:34px;border-radius:9px;vertical-align:middle;margin-left:8px"><span id="hT">ختمة</span></div><small id="hS">رفيقك لختم القرآن الكريم</small></header>
 <div id="toast"></div>
 <div id="modal"></div>
+<div id="book"><div class="bk-top"><button id="bkX">✕ إغلاق</button><span class="bt" id="bkT"></span><span id="bkM"></span></div><div class="bk-stage" id="bkS"></div><div class="bk-hint" id="bkH"></div></div>
 
 <section class="view" id="v-wird"></section>
 
@@ -212,6 +242,7 @@ body.reg header #hdAcc{display:none}
     <div class="mid"><input id="pgNo" type="number" min="1" max="604" inputmode="numeric"> <span id="pgTot"></span><div id="meta"></div></div>
     <button class="btn sm" id="nx">التالية</button>
   </div>
+  <button class="btn sm gold" id="bkOpen" style="margin:0 0 10px">📖 وضع الكتاب (تقليب الصفحات)</button>
   <div id="page" class="page" dir="rtl"></div>
   <div id="endcard"></div>
   <div class="pnav"><button class="btn ghost" id="pv2">السابقة</button><button class="btn" id="nx2">التالية</button></div>
@@ -589,6 +620,135 @@ $('page').addEventListener('touchend', e => {
   if (dx > 0 && cur < TOTAL) { renderPage(cur + 1); window.scrollTo(0, 0); }
   if (dx < 0 && cur > 1) { renderPage(cur - 1); window.scrollTo(0, 0); }
 }, { passive: true });
+
+
+// ---------- وضع الكتاب ----------
+const BK = { on: false, bp: 1, spread: false, busy: false };
+async function bkFill(box, n) {
+  box.textContent = '';
+  if (n < 1 || n > TOTAL) { box.className = 'bk-pg'; box.style.visibility = 'hidden'; return; }
+  box.style.visibility = ''; box.className = 'bk-pg ld'; box.textContent = tl('جاري التحميل…');
+  let ayahs, bism;
+  try { [ayahs, bism] = await Promise.all([getPage(n), getBism()]); } catch (e) { box.textContent = tl('تعذر التحميل. تأكد من الاتصال.'); return; }
+  box.className = 'bk-pg'; box.textContent = '';
+  let p = null;
+  ayahs.forEach(a => {
+    const sn = a[0], num = a[2]; let t = a[3];
+    if (num === 1) {
+      const h = document.createElement('div'); h.className = 'sura'; h.textContent = a[1]; box.appendChild(h);
+      if (sn !== 1 && sn !== 9) { const b = document.createElement('div'); b.className = 'bism'; b.textContent = bism; box.appendChild(b); if (t.startsWith(bism)) t = t.slice(bism.length).trim(); }
+      p = null;
+    }
+    if (!p) { p = document.createElement('p'); p.className = 'ayat'; box.appendChild(p); }
+    const sp = document.createElement('span'); sp.textContent = t + ' ';
+    const m = document.createElement('span'); m.className = 'num'; m.textContent = AR(num);
+    p.appendChild(sp); p.appendChild(m); p.appendChild(document.createTextNode(' '));
+  });
+  const pn = document.createElement('div'); pn.className = 'pn'; pn.textContent = AR(n); box.appendChild(pn);
+  box._m = ayahs[0];
+  bkFit(box);
+}
+function bkFit(box) {
+  let f = Math.min(st.fs || 30, 26); box.style.setProperty('--bfs', f + 'px');
+  let g = 0; while (box.scrollHeight > box.clientHeight + 1 && f > 11 && g++ < 30) { f -= 1; box.style.setProperty('--bfs', f + 'px'); }
+  box.style.overflowY = box.scrollHeight > box.clientHeight + 1 ? 'auto' : 'hidden';
+}
+function bkTrack(n) {
+  if (n < 1 || n > TOTAL) return;
+  cur = n; st.last = n;
+  if (st.plan && !st.todayDone && n > st.todayStart && n <= wirdEnd() && n > st.todayRead) st.todayRead = n;
+  save();
+}
+function bkHint() {
+  const h = $('bkH'), top = Math.min(TOTAL, BK.bp + (BK.spread ? 1 : 0));
+  if (st.plan && !st.todayDone && st.done < TOTAL && top >= wirdEnd() && top > st.todayStart) {
+    h.innerHTML = tl('وصلت إلى نهاية ورد اليوم <button id="bkDone">أتممت الورد ✓</button>');
+    $('bkDone').onclick = () => { markDone(); bkClose(); go('wird'); };
+  } else h.textContent = BK.spread ? tl('اسحب أو اضغط على الأطراف لتقليب الصفحة') : tl('أدر الجوال أفقياً لتظهر صفحتان كالمصحف');
+}
+function bkTitle() {
+  const m = ($('bkS').querySelector('.bk-half.R .bk-pg') || {})._m || ($('bkS').querySelector('.bk-pg') || {})._m;
+  $('bkT').textContent = BK.spread ? tl('صفحة ') + AR(BK.bp) + ' – ' + AR(Math.min(TOTAL, BK.bp + 1)) : tl('صفحة ') + AR(BK.bp);
+  $('bkM').textContent = m ? tl('جزء ') + AR(m[4]) : '';
+}
+function bkBuild() {
+  const S = $('bkS'); BK.spread = S.clientWidth >= 620;
+  if (BK.spread && BK.bp % 2 === 0) BK.bp -= 1;
+  if (BK.bp < 1) BK.bp = 1;
+  S.innerHTML = '<div class="bk-book' + (BK.spread ? '' : ' one') + '"><div class="bk-half R"><div class="bk-pg"></div></div>' + (BK.spread ? '<div class="bk-half L"><div class="bk-pg"></div></div>' : '') + '</div><button class="bk-nav nl" id="bkNx" aria-label="next">‹</button><button class="bk-nav nr" id="bkPv" aria-label="prev">›</button>';
+  $('bkNx').onclick = () => bkTurn(1); $('bkPv').onclick = () => bkTurn(-1);
+  const R = S.querySelector('.bk-half.R .bk-pg'), L = S.querySelector('.bk-half.L .bk-pg');
+  Promise.all([bkFill(R, BK.bp), L ? bkFill(L, BK.bp + 1) : null]).then(() => { bkTitle(); bkHint(); });
+  bkTrack(Math.min(TOTAL, BK.bp + (BK.spread ? 1 : 0)));
+  [BK.bp + 2, BK.bp + 3].forEach(x => { if (x <= TOTAL) getPage(x).catch(() => {}); });
+}
+function bkOpen(n) {
+  BK.bp = Math.min(TOTAL, Math.max(1, n || cur || 1)); BK.on = true;
+  $('book').classList.add('on'); document.body.style.overflow = 'hidden';
+  requestAnimationFrame(bkBuild);
+}
+function bkClose() { BK.on = false; $('book').classList.remove('on'); document.body.style.overflow = ''; if (curView === 'read') renderPage(cur); }
+const bkDelay = ms => new Promise(r => setTimeout(r, ms));
+async function bkTurn(dir) {   // dir=1 التالية، -1 السابقة
+  if (BK.busy) return;
+  const step = BK.spread ? 2 : 1, nb = BK.bp + dir * step;
+  if (nb < 1 || nb > TOTAL) return;
+  BK.busy = true;
+  const S = $('bkS'), book = S.querySelector('.bk-book');
+  const R = book.querySelector('.bk-half.R'), L = book.querySelector('.bk-half.L');
+  const wraps = [];
+  const mk = () => { const w = document.createElement('div'); w.className = 'bk-half R'; w.style.visibility = 'hidden'; w.style.zIndex = '-1'; const d = document.createElement('div'); d.className = 'bk-pg'; w.appendChild(d); book.appendChild(w); wraps.push(w); return d; };
+  const leaf = document.createElement('div'); leaf.className = 'bk-leaf';
+  const front = document.createElement('div'), back = document.createElement('div'); front.className = 'bk-face'; back.className = 'bk-face back';
+  leaf.appendChild(front); leaf.appendChild(back);
+  try {
+    if (!BK.spread) {   // صفحة واحدة
+      const oldPg = R.querySelector('.bk-pg').cloneNode(true); oldPg.classList.add('fr'); front.appendChild(oldPg);
+      const nbox = mk(); await bkFill(nbox, nb);
+      if (dir > 0) {
+        R.querySelector('.bk-pg').replaceWith(nbox);
+        leaf.style.left = '0'; leaf.style.transformOrigin = 'right center'; book.appendChild(leaf);
+        await bkDelay(30); leaf.style.setProperty('--sh', 1); leaf.style.transform = 'rotateY(95deg)'; await bkDelay(880);
+      } else {
+        front.innerHTML = ''; front.appendChild(nbox); nbox.classList.add('fr');
+        leaf.style.left = '0'; leaf.style.transformOrigin = 'right center'; leaf.style.transform = 'rotateY(95deg)'; leaf.style.transition = 'none'; book.appendChild(leaf);
+        await bkDelay(30); leaf.style.transition = ''; leaf.style.transform = 'rotateY(0deg)'; await bkDelay(880);
+        R.querySelector('.bk-pg').replaceWith(nbox.cloneNode(true));
+      }
+    } else if (dir > 0) {  // نقلب الصفحة اليسرى فوق الكعب نحو اليمين
+      const oldL = L.querySelector('.bk-pg').cloneNode(true); oldL.classList.add('fl'); front.appendChild(oldL);
+      const nR = mk(), nL = mk(); await Promise.all([bkFill(nR, nb), bkFill(nL, nb + 1)]);
+      const bk = nR.cloneNode(true); bk.classList.add('fr'); back.appendChild(bk);
+      L.querySelector('.bk-pg').replaceWith(nL);
+      leaf.style.left = '0'; leaf.style.transformOrigin = 'right center'; book.appendChild(leaf);
+      await bkDelay(30); leaf.style.setProperty('--sh', 1); leaf.style.transform = 'rotateY(180deg)'; await bkDelay(880);
+      R.querySelector('.bk-pg').replaceWith(nR);
+    } else {               // السابقة: نقلب الصفحة اليمنى نحو اليسار
+      const oldR = R.querySelector('.bk-pg').cloneNode(true); oldR.classList.add('fr'); front.appendChild(oldR);
+      const nR = mk(), nL = mk(); await Promise.all([bkFill(nR, nb), bkFill(nL, nb + 1)]);
+      const bk = nL.cloneNode(true); bk.classList.add('fl'); back.appendChild(bk);
+      R.querySelector('.bk-pg').replaceWith(nR);
+      leaf.style.right = '0'; leaf.style.transformOrigin = 'left center'; book.appendChild(leaf);
+      await bkDelay(30); leaf.style.setProperty('--sh', 1); leaf.style.transform = 'rotateY(-180deg)'; await bkDelay(880);
+      L.querySelector('.bk-pg').replaceWith(nL);
+    }
+  } catch (e) {}
+  leaf.remove(); wraps.forEach(w => w.remove()); BK.bp = nb; BK.busy = false;
+  bkTrack(Math.min(TOTAL, nb + (BK.spread ? 1 : 0))); bkTitle(); bkHint();
+  [nb + 2, nb + 3, nb - 2].forEach(x => { if (x >= 1 && x <= TOTAL) getPage(x).catch(() => {}); });
+}
+$('bkOpen').onclick = () => bkOpen(cur);
+$('bkX').onclick = bkClose;
+(function () {
+  let sx = null; const S = $('bkS');
+  S.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  S.addEventListener('touchend', e => {
+    if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null;
+    if (Math.abs(dx) < 50) return; bkTurn(dx > 0 ? 1 : -1);
+  }, { passive: true });
+  window.addEventListener('resize', () => { if (BK.on && !BK.busy) bkBuild(); });
+  window.addEventListener('orientationchange', () => { if (BK.on) setTimeout(() => { if (!BK.busy) bkBuild(); }, 350); });
+})();
 
 // ---------- الفهرس ----------
 let idxTab = 's';
