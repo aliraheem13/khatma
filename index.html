@@ -13,46 +13,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--fs:30px;--pri:#0f5c4d;--gold:#c9a24b;--bg:#f6f1e7;--card:#fffdf8;--txt:#1d2a26;--mut:#6b7a74;--line:#e4dccb}
+:root{--ui:1;--fs:30px;--pri:#0f5c4d;--gold:#c9a24b;--bg:#f6f1e7;--card:#fffdf8;--txt:#1d2a26;--mut:#6b7a74;--line:#e4dccb}
 [data-theme=dark]{--bg:#12171a;--card:#1b2226;--txt:#e8ece9;--mut:#93a39c;--line:#2b363b;--pri:#1f8a6e}
 [data-theme=sepia]{--bg:#efe3c8;--card:#f6ecd5;--txt:#3b2f1b;--mut:#7d6b49;--line:#dccaa0}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:Cairo,Tahoma,Arial,sans-serif;padding-bottom:84px;line-height:1.6}
-header{background:var(--pri);color:#fff;padding:14px 16px;text-align:center;font-size:20px;font-weight:700;letter-spacing:.5px}
-header small{display:block;font-weight:400;font-size:12px;opacity:.85}
+body{font-size:calc(16px * var(--ui));margin:0;background:var(--bg);color:var(--txt);font-family:Cairo,Tahoma,Arial,sans-serif;padding-bottom:84px;line-height:1.6}
+header{background:var(--pri);color:#fff;padding:14px 16px;text-align:center;font-size:calc(20px * var(--ui));font-weight:700;letter-spacing:.5px}
+header small{display:block;font-weight:400;font-size:calc(12px * var(--ui));opacity:.85}
 .view{display:none;max-width:720px;margin:0 auto;padding:14px}
 .view.on{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .center{text-align:center}
-h2{margin:0 0 6px;font-size:20px}
-.mut{color:var(--mut);font-size:14px}
+h2{margin:0 0 6px;font-size:calc(20px * var(--ui))}
+.mut{color:var(--mut);font-size:calc(14px * var(--ui))}
 .hero{background:linear-gradient(135deg,var(--pri),#13795f);color:#fff;border:0;text-align:center}
-.hero .lbl{opacity:.85;font-size:14px}
-.hero .big{font-size:30px;font-weight:700;margin:6px 0}
-.hero .sub{opacity:.9;font-size:14px}
-.big{font-size:44px}
-.btn{display:block;width:100%;padding:13px;border:0;border-radius:14px;background:var(--pri);color:#fff;font:inherit;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+.hero .lbl{opacity:.85;font-size:calc(14px * var(--ui))}
+.hero .big{font-size:calc(30px * var(--ui));font-weight:700;margin:6px 0}
+.hero .sub{opacity:.9;font-size:calc(14px * var(--ui))}
+.big{font-size:calc(44px * var(--ui))}
+.btn{display:block;width:100%;padding:13px;border:0;border-radius:14px;background:var(--pri);color:#fff;font:inherit;font-size:calc(16px * var(--ui));font-weight:600;cursor:pointer;margin-top:10px}
 .btn.gold{background:var(--gold);color:#2a2105}
 .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
 .hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.5)}
-.btn.sm{width:auto;margin:0;padding:9px 14px;font-size:14px}
+.btn.sm{width:auto;margin:0;padding:9px 14px;font-size:calc(14px * var(--ui))}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .chip{padding:9px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;cursor:pointer}
 .chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
-input[type=password],input.pwf{width:100%;padding:11px 11px 11px 46px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
-.pw{position:relative}.pw .eye{position:absolute;left:6px;top:12px;width:38px;height:38px;border:0;background:none;font-size:20px;cursor:pointer;padding:0;line-height:1}
-input[type=number],input[type=time],input[type=text]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
+input[type=password],input.pwf{width:100%;padding:11px 11px 11px 46px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:calc(16px * var(--ui));margin-top:6px}
+.pw{position:relative}.pw .eye{position:absolute;left:6px;top:12px;width:38px;height:38px;border:0;background:none;font-size:calc(20px * var(--ui));cursor:pointer;padding:0;line-height:1}
+input[type=number],input[type=time],input[type=text]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:calc(16px * var(--ui));margin-top:6px}
 .bar{height:12px;background:var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
 .bar>div{height:100%;background:linear-gradient(90deg,var(--gold),var(--pri))}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .stat{background:var(--bg);border-radius:14px;padding:12px;text-align:center}
-.stat b{display:block;font-size:20px}
-.stat span{font-size:12px;color:var(--mut)}
+.stat b{display:block;font-size:calc(20px * var(--ui))}
+.stat span{font-size:calc(12px * var(--ui));color:var(--mut)}
 .rbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0}
-.rbar .mid{text-align:center;flex:1;font-size:13px;color:var(--mut)}
+.rbar .mid{text-align:center;flex:1;font-size:calc(13px * var(--ui));color:var(--mut)}
 .rbar input{width:70px;display:inline-block;text-align:center;margin:0;padding:6px}
 .page{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;font-family:'Amiri Quran','Scheherazade New',serif;font-size:var(--fs);line-height:2.35;text-align:justify;min-height:300px}
-.page.loading{display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-size:16px;color:var(--mut)}
+.page.loading{display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-size:calc(16px * var(--ui));color:var(--mut)}
 .ayat{margin:0 0 6px}
 .sura{margin:14px 0 8px;padding:6px;text-align:center;border:2px solid var(--gold);border-radius:12px;color:var(--pri);font-size:calc(var(--fs) * .85);background:var(--bg)}
 .bism{text-align:center;margin-bottom:6px}
@@ -63,29 +63,29 @@ input[type=number],input[type=time],input[type=text]{width:100%;padding:11px;bor
 .seg button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;cursor:pointer}
 .seg button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
 .item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:8px;cursor:pointer}
-.item .n{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.item .n{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:calc(13px * var(--ui));flex:none}
 .item .t{flex:1}
 .item .t small{display:block;color:var(--mut)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
-nav button{flex:1;padding:9px 0 7px;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;cursor:pointer}
-nav button span{display:block;font-size:20px}
+nav button{flex:1;padding:9px 0 7px;border:0;background:none;color:var(--mut);font:inherit;font-size:calc(12px * var(--ui));cursor:pointer}
+nav button span{display:block;font-size:calc(20px * var(--ui))}
 nav button.on{color:var(--pri);font-weight:700}
 #toast{position:fixed;z-index:50;top:12px;left:12px;right:12px;max-width:600px;margin:0 auto;background:#222;color:#fff;border-radius:14px;padding:12px 16px;text-align:center;display:none}
-.note{font-size:13px;color:var(--mut);margin-top:8px}
+.note{font-size:calc(13px * var(--ui));color:var(--mut);margin-top:8px}
 #modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px}
 #modal.on{display:flex}
 .mbox{background:var(--card);color:var(--txt);border-radius:20px;padding:22px;max-width:420px;width:100%;text-align:center}
 .mbox p{margin:8px 0 4px;line-height:1.9}
-select,input[type=email],input[type=tel]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
+select,input[type=email],input[type=tel]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:calc(16px * var(--ui));margin-top:6px}
 body.reg nav{display:none}
-nav button{font-size:11px}
+nav button{font-size:calc(11px * var(--ui))}
 .ring{width:min(72vw,290px);aspect-ratio:1;border-radius:50%;margin:14px auto;padding:10px;background:conic-gradient(var(--gold) calc(var(--p,0) * 1%),var(--line) 0)}
 .tsb{width:100%;height:100%;border-radius:50%;border:0;background:radial-gradient(circle at 30% 25%,#1f8a6e,var(--pri));color:#fff;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .tsb:active{transform:scale(.97)}
-.tsb span{font-size:64px;font-weight:700;line-height:1.1}
-.tsb small{font-size:14px;opacity:.9;margin-top:6px}
-.dhikr{font-size:24px;text-align:center;margin:6px 0;font-family:'Amiri Quran',serif;min-height:40px}
+.tsb span{font-size:calc(64px * var(--ui));font-weight:700;line-height:1.1}
+.tsb small{font-size:calc(14px * var(--ui));opacity:.9;margin-top:6px}
+.dhikr{font-size:calc(24px * var(--ui));text-align:center;margin:6px 0;font-family:'Amiri Quran',serif;min-height:40px}
 .scrollx{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px}
 .scrollx .chip{white-space:nowrap}
 .lnk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:8px}
@@ -94,12 +94,12 @@ nav button{font-size:11px}
 .lnk .t small{display:block;color:var(--mut)}
 .lnk.today{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
 a.btn{text-decoration:none;text-align:center}
-textarea{width:100%;min-height:220px;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-family:'Amiri Quran',serif;font-size:20px;line-height:2;margin-top:8px;direction:rtl}
+textarea{width:100%;min-height:220px;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-family:'Amiri Quran',serif;font-size:calc(20px * var(--ui));line-height:2;margin-top:8px;direction:rtl}
 .lnk .acts{display:flex;gap:6px;flex:none}
 .txt{direction:rtl;white-space:pre-wrap;text-align:right;font-family:'Amiri Quran',serif;font-size:var(--fs);line-height:2.2;max-height:60vh;overflow:auto}
 .pcard{cursor:pointer;border-color:var(--gold)}
 nav button{padding-left:0;padding-right:0}
-nav button em{font-size:10px}
+nav button em{font-size:calc(10px * var(--ui))}
 select{max-width:100%}
 
 /* khatma-religious-theme: كاشي المراقد - لازوردي وفيروزي وذهبي مع زخارف النجمة الثمانية */
@@ -114,15 +114,15 @@ body{background:var(--bg) var(--pat-b) 0 0/56px 56px;font-family:Cairo,Tahoma,Ar
 /* الترويسة: لوح لازوردي بزخرفة نجمية وحافة عقود */
 header{position:relative;z-index:6;background:var(--pat-g) 0 0/56px 56px,linear-gradient(180deg,var(--lapis),var(--hb));color:var(--gold2);padding:9px 16px 20px;margin-bottom:12px;box-shadow:0 3px 10px rgba(10,26,48,.25)}
 header::after{content:'';position:absolute;left:0;right:0;bottom:-11px;height:12px;pointer-events:none;background:radial-gradient(circle at 50% 0,var(--hb) 0 7.5px,var(--gold) 8px 9.5px,transparent 10px) 0 0/20px 12px repeat-x}
-.bsm{font-family:'Amiri Quran','Scheherazade New',serif;font-size:17px;line-height:1.8;color:var(--gold2)}
+.bsm{font-family:'Amiri Quran','Scheherazade New',serif;font-size:calc(17px * var(--ui));line-height:1.8;color:var(--gold2)}
 .brand{display:flex;align-items:center;justify-content:center;gap:10px}
 header #lg{width:40px!important;height:40px!important;margin:0!important;vertical-align:initial!important;border-radius:50% 50% 9px 9px!important;border:1.5px solid var(--gold)}
-#hT{font-family:'Reem Kufi',Cairo,sans-serif;font-size:31px;font-weight:700;line-height:1.3;background:linear-gradient(180deg,#fff3c4,#d9b25a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-header small{color:#b8c9de;opacity:1;font-size:12.5px;margin-top:1px}
+#hT{font-family:'Reem Kufi',Cairo,sans-serif;font-size:calc(31px * var(--ui));font-weight:700;line-height:1.3;background:linear-gradient(180deg,#fff3c4,#d9b25a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+header small{color:#b8c9de;opacity:1;font-size:calc(12.5px * var(--ui));margin-top:1px}
 
 /* البطاقات: إطار مزدوج كحواف الكاشي */
 .card{border-radius:12px;border:1px solid var(--gsoft);padding:20px 18px;box-shadow:inset 0 0 0 4px var(--card),inset 0 0 0 5px rgba(195,154,62,.24),0 2px 10px rgba(15,45,82,.07)}
-h2{font-family:'Reem Kufi',Cairo,sans-serif;font-weight:700;font-size:19px;color:var(--lapis2)}
+h2{font-family:'Reem Kufi',Cairo,sans-serif;font-weight:700;font-size:calc(19px * var(--ui));color:var(--lapis2)}
 [data-theme=dark] h2{color:var(--gold2)}
 .card h2::before{content:'';display:inline-block;width:15px;height:15px;margin-inline-end:8px;vertical-align:-2px;background:var(--star) center/contain no-repeat}
 .mut{color:var(--mut)}
@@ -130,7 +130,7 @@ h2{font-family:'Reem Kufi',Cairo,sans-serif;font-weight:700;font-size:19px;color
 /* ورد اليوم: محراب */
 .hero{position:relative;background:var(--pat-g) 0 0/56px 56px,linear-gradient(165deg,#0d2a4e 0%,#14506b 62%,#1a6f80 100%);border:0;border-radius:50% 50% 12px 12px/64px 64px 12px 12px;padding:38px 20px 20px;box-shadow:inset 0 0 0 2px rgba(236,209,131,.85),0 8px 20px rgba(15,45,82,.28)}
 .hero::before{content:'';position:absolute;inset:7px;border:1px solid rgba(236,209,131,.35);border-radius:inherit;pointer-events:none}
-.hero .lbl{color:var(--gold2);opacity:1;font-family:'Reem Kufi',Cairo,sans-serif;font-size:15px}
+.hero .lbl{color:var(--gold2);opacity:1;font-family:'Reem Kufi',Cairo,sans-serif;font-size:calc(15px * var(--ui))}
 .hero .big{font-family:'Reem Kufi',Cairo,sans-serif;color:#fff6d6;font-weight:700}
 .hero .sub{color:#d6e2ef;opacity:1}
 
@@ -141,7 +141,7 @@ h2{font-family:'Reem Kufi',Cairo,sans-serif;font-weight:700;font-size:19px;color
 .hero .btn.ghost{color:#fff6d6;border-color:rgba(236,209,131,.6)}
 .chip,.seg button{border-radius:9px;border-color:var(--gsoft)}
 .chip.on,.seg button.on{background:var(--pri);color:#fff;border-color:var(--gold)}
-input[type=number],input[type=time],input[type=text],input[type=email],input[type=tel],select,textarea{border-radius:9px;border-color:var(--gsoft)}
+input[type=number],input[type=time],input[type=text],input[type=email],input[type=tel],input[type=password],input.pwf,select,textarea{border-radius:9px;border-color:var(--gsoft)}
 .bar{height:11px;border:1px solid var(--gsoft);background:var(--bg)}
 .bar>div{background:linear-gradient(90deg,var(--gold),var(--gold2))}
 .stat{border:1px solid var(--line);border-radius:10px}
@@ -174,7 +174,7 @@ nav{background:linear-gradient(180deg,var(--hb),var(--lapis));border-top:2px sol
 nav button{position:relative;color:#9db3cc;padding:8px 0 6px}
 nav button span{display:flex;justify-content:center;height:24px;font-size:0}
 nav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-nav button em{font-size:10.5px}
+nav button em{font-size:calc(10.5px * var(--ui))}
 nav button.on{color:var(--gold2)}
 nav button.on::before{content:'';position:absolute;top:-2px;left:26%;right:26%;height:3px;background:var(--gold2);border-radius:0 0 3px 3px}
 
@@ -184,7 +184,7 @@ input[type=checkbox]{accent-color:var(--pri);width:20px;height:20px}
 #toast{background:var(--lapis);color:#fff6d6;border:1px solid var(--gold)}
 header #hdAcc{position:absolute;left:12px;top:56px;z-index:7;background:rgba(255,255,255,.12);color:var(--gold2);border:1.5px solid var(--gold);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.reg header #hdAcc{display:none}
-.hj{text-align:center;border:1.5px solid var(--gold)}.hjd{font-family:'Reem Kufi','Cairo',sans-serif;font-size:26px;font-weight:700;color:var(--pri)}.hjo{margin-top:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#f3d98b,#e6c06a);color:#3b2a05;font-weight:700;line-height:1.7}.hjn{margin-top:8px;font-size:14px;opacity:.85}
+.hj{text-align:center;border:1.5px solid var(--gold)}.hjd{font-family:'Reem Kufi','Cairo',sans-serif;font-size:calc(26px * var(--ui));font-weight:700;color:var(--pri)}.hjo{margin-top:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#f3d98b,#e6c06a);color:#3b2a05;font-weight:700;line-height:1.7}.hjn{margin-top:8px;font-size:calc(14px * var(--ui));opacity:.85}
 
 </style>
 </head>
@@ -316,6 +316,7 @@ function toast(t) { const e = $('toast'); e.textContent = t; e.style.display = '
 function applyLook() {
   document.documentElement.setAttribute('data-theme', st.theme);
   document.documentElement.style.setProperty('--fs', st.fs + 'px');
+  document.documentElement.style.setProperty('--ui', String(st.ui || 1));
 }
 function rollover() {
   const t = today();
@@ -1280,7 +1281,7 @@ async function renderSettings() {
     tl('<div class="card"><h2>التاريخ الهجري</h2><p class="mut">يعتمد بدء الأشهر على رؤية الهلال، فإذا اختلف التاريخ يوماً عندك عدّله هنا.</p><div class="row" style="justify-content:center;gap:14px"><button class="btn sm ghost" id="hjM">− يوم</button><b id="hjV"></b><button class="btn sm ghost" id="hjP">+ يوم</button></div></div>') +
     tl('<div class="card"><h2>اللغة / Language</h2>') + langRow() + '</div>' +
     tl('<div class="card"><h2>المظهر</h2><div class="chips">') + th.map(x => '<button class="chip' + (st.theme === x[0] ? ' on' : '') + '" data-th="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
-    tl('<label class="mut">حجم الخط</label><input id="fs" type="range" min="22" max="46" value="') + st.fs + '" style="width:100%"></div>' +
+    tl('<label class="mut">حجم خط التطبيق (كل الكتابات): <b id="uiv"></b></label><input id="ui" type="range" min="0.85" max="1.2" step="0.05" value="') + (st.ui || 1) + '" style="width:100%"><div style="height:10px"></div>' + tl('<label class="mut">حجم خط القرآن والأدعية: <b id="fsv"></b></label><input id="fs" type="range" min="22" max="46" value="') + st.fs + '" style="width:100%"><div id="fsp" class="txt" style="max-height:none;text-align:center;margin-top:8px;line-height:2">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div></div>' +
     tl('<div class="card"><h2>التذكير اليومي</h2><div class="row"><span>تفعيل التذكير</span><input id="rm" type="checkbox" ') + (st.remind.on ? 'checked' : '') + ' style="width:22px;height:22px"></div>' +
     tl('<label class="mut">وقت التذكير</label><input id="rt" type="time" value="') + st.remind.time + '">' +
     tl('<button class="btn gold" id="ics">إضافة تذكير يومي إلى تقويم الجوال</button>') +
@@ -1308,7 +1309,7 @@ async function renderSettings() {
   if ($('plo')) $('plo').onclick = () => { if (confirm(tl('تسجيل الخروج؟ تقدّمك محفوظ في حسابك وتعود إليه عند الدخول.'))) { acctSync(); st.acct = null; st.profile = null; resetProg(); save(); regEdit = false; regMode = 'login'; go('wird'); } };
   v.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
   v.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { st.theme = b.dataset.th; save(); applyLook(); renderSettings(); });
-  $('fs').oninput = () => { st.fs = +$('fs').value; save(); applyLook(); };
+  $('uiv').textContent = AR(Math.round((st.ui || 1) * 100)) + '٪'; $('ui').oninput = () => { st.ui = +$('ui').value; $('uiv').textContent = AR(Math.round(st.ui * 100)) + '٪'; save(); applyLook(); }; $('fsv').textContent = AR(st.fs); $('fs').oninput = () => { st.fs = +$('fs').value; $('fsv').textContent = AR(st.fs); save(); applyLook(); };
   $('rm').onchange = async () => {
     st.remind.on = $('rm').checked; save();
     if (st.remind.on && 'Notification' in window && Notification.permission === 'default') { try { await Notification.requestPermission(); } catch (e) {} }
@@ -1766,7 +1767,7 @@ const LT = t => {
   return EN[t] !== undefined ? EN[t] : t;
 };
 Object.assign(EN, {'الصلاة': 'Prayer', 'دعاء الفرج': 'Dua al-Faraj', 'للدعاء بتعجيل الفرج': 'For the hastening of the relief', 'دعاء اليوم': 'Dua of the day', 'دعاء يوم السبت': 'Dua of Saturday', 'دعاء يوم الأحد': 'Dua of Sunday', 'دعاء يوم الاثنين': 'Dua of Monday', 'دعاء يوم الثلاثاء': 'Dua of Tuesday', 'دعاء يوم الأربعاء': 'Dua of Wednesday', 'دعاء يوم الخميس': 'Dua of Thursday', 'دعاء يوم الجمعة': 'Dua of Friday'});
-Object.assign(EN, {'تسجيل الدخول':'Log in','البريد الإلكتروني أو رقم الهاتف':'Email or phone number','كلمة المرور':'Password','اكتب البريد أو الهاتف وكلمة المرور':'Enter email/phone and password','لا يوجد حساب بهذه البيانات على هذا الجهاز':'No account with these details on this device','كلمة المرور غير صحيحة':'Wrong password','ليس لدي حساب، إنشاء حساب جديد':'No account? Create one','إلغاء':'Cancel','أهلاً بعودتك':'Welcome back','وصلت في قراءة القرآن إلى صفحة ':'You reached page ','. هل تريد المتابعة من النقطة التي توقفت عندها أم البدء من الصفر؟':'. Continue where you stopped or start over?','متابعة من حيث توقفت':'Continue where I stopped','البدء من الصفر':'Start from zero','إنشاء حساب جديد':'Create account','كلمة المرور * (٦ أحرف على الأقل)':'Password * (min 6 chars)','كلمة مرور جديدة (اتركها فارغة لعدم التغيير)':'New password (leave empty to keep)','كلمة المرور (لإنشاء حساب للدخول لاحقاً، اختياري)':'Password (optional, to log in later)','كلمة المرور ٦ أحرف على الأقل':'Password must be at least 6 characters','اكتب كلمة المرور':'Enter a password','يوجد حساب بهذا الرقم، سجّل الدخول بدلاً من ذلك':'An account with this number exists, log in instead','إنشاء الحساب':'Create account','لدي حساب، تسجيل الدخول':'I have an account, log in','تسجيل الخروج':'Log out','تسجيل الخروج؟ تقدّمك محفوظ في حسابك وتعود إليه عند الدخول.':'Log out? Your progress is saved in your account.','الحسابات تُحفظ على هذا الجهاز. إن لم تنشئ حساباً هنا من قبل فاختر «إنشاء حساب جديد».':'Accounts are stored on this device. If you have not created one here, choose Create account.'}); Object.assign(EN, {'لم تتفعّل الإشعارات الحقيقية تلقائياً. فعّلها من الإعدادات حتى يصلك التذكير وأوقات الأذان.':'Real notifications were not enabled automatically. Turn them on in Settings to get reminders and adhan times.','فتح الإعدادات':'Open settings'}); Object.assign(EN, {'جاري التفعيل…':'Enabling…','جاري التفعيل، انتظر قليلاً…':'Enabling, please wait…','تم التفعيل ✓ سيصلك التذكير والأذان حتى والتطبيق مغلق.':'Enabled ✓ You will get reminders and adhan alerts even when the app is closed.','لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.':'Not completed. Make sure you allowed notifications and try again.'}); Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.':'Location is not allowed. Turn on Location Services for the app (or Safari) in phone Settings and try again, or choose your city.','لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.':'Could not get your location now. Make sure Location Services/GPS is on and try somewhere open, or choose your city.','الموقع غير مدعوم على هذا الجهاز.':'Location is not supported on this device.','السماح بالإشعارات':'Allow notifications','هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.':'Allow Khatma to send you notifications? We use them for adhan alerts and your daily Quran reminder.','نعم، أسمح':'Yes, allow','ليس الآن':'Not now','السماح بالموقع':'Allow location','هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟':'Allow Khatma to use your location to set accurate prayer times and qibla for where you are?','لا، سأختار مدينتي':'No, I will choose my city','جاري تحديد الموقع…':'Locating…','تم تحديد موقعك وأوقات الصلاة.':'Location set. Prayer times updated.','تعذّر تحديد الموقع. يمكنك اختيار مدينتك من تبويب الصلاة.':'Could not get your location. You can choose your city in the Prayer tab.'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
+Object.assign(EN, {'حجم خط التطبيق (كل الكتابات): ':'App text size (everything): ','حجم خط القرآن والأدعية: ':'Quran & dua text size: ','تسجيل الدخول':'Log in','البريد الإلكتروني أو رقم الهاتف':'Email or phone number','كلمة المرور':'Password','اكتب البريد أو الهاتف وكلمة المرور':'Enter email/phone and password','لا يوجد حساب بهذه البيانات على هذا الجهاز':'No account with these details on this device','كلمة المرور غير صحيحة':'Wrong password','ليس لدي حساب، إنشاء حساب جديد':'No account? Create one','إلغاء':'Cancel','أهلاً بعودتك':'Welcome back','وصلت في قراءة القرآن إلى صفحة ':'You reached page ','. هل تريد المتابعة من النقطة التي توقفت عندها أم البدء من الصفر؟':'. Continue where you stopped or start over?','متابعة من حيث توقفت':'Continue where I stopped','البدء من الصفر':'Start from zero','إنشاء حساب جديد':'Create account','كلمة المرور * (٦ أحرف على الأقل)':'Password * (min 6 chars)','كلمة مرور جديدة (اتركها فارغة لعدم التغيير)':'New password (leave empty to keep)','كلمة المرور (لإنشاء حساب للدخول لاحقاً، اختياري)':'Password (optional, to log in later)','كلمة المرور ٦ أحرف على الأقل':'Password must be at least 6 characters','اكتب كلمة المرور':'Enter a password','يوجد حساب بهذا الرقم، سجّل الدخول بدلاً من ذلك':'An account with this number exists, log in instead','إنشاء الحساب':'Create account','لدي حساب، تسجيل الدخول':'I have an account, log in','تسجيل الخروج':'Log out','تسجيل الخروج؟ تقدّمك محفوظ في حسابك وتعود إليه عند الدخول.':'Log out? Your progress is saved in your account.','الحسابات تُحفظ على هذا الجهاز. إن لم تنشئ حساباً هنا من قبل فاختر «إنشاء حساب جديد».':'Accounts are stored on this device. If you have not created one here, choose Create account.'}); Object.assign(EN, {'لم تتفعّل الإشعارات الحقيقية تلقائياً. فعّلها من الإعدادات حتى يصلك التذكير وأوقات الأذان.':'Real notifications were not enabled automatically. Turn them on in Settings to get reminders and adhan times.','فتح الإعدادات':'Open settings'}); Object.assign(EN, {'جاري التفعيل…':'Enabling…','جاري التفعيل، انتظر قليلاً…':'Enabling, please wait…','تم التفعيل ✓ سيصلك التذكير والأذان حتى والتطبيق مغلق.':'Enabled ✓ You will get reminders and adhan alerts even when the app is closed.','لم يكتمل التفعيل. تأكد أنك سمحت بالإشعارات ثم أعد المحاولة.':'Not completed. Make sure you allowed notifications and try again.'}); Object.assign(EN, {'أضف اسمك (اختياري) ليخاطبك التطبيق في التذكيرات: «هيّا يا اسمك أكمل قراءة القرآن».':'Add your name (optional) so the app addresses you in reminders.','إضافة اسمي':'Add my name'}); Object.assign(EN, {'الموقع غير مسموح. فعّل خدمات الموقع للتطبيق (أو لمتصفح Safari) من إعدادات الجوال ثم أعد المحاولة، أو اختر مدينتك من القائمة.':'Location is not allowed. Turn on Location Services for the app (or Safari) in phone Settings and try again, or choose your city.','لم أتمكن من التقاط الموقع الآن. تأكد أن خدمات الموقع وGPS مفعّلة وجرّب في مكان مفتوح، أو اختر مدينتك من القائمة.':'Could not get your location now. Make sure Location Services/GPS is on and try somewhere open, or choose your city.','الموقع غير مدعوم على هذا الجهاز.':'Location is not supported on this device.','السماح بالإشعارات':'Allow notifications','هل تسمح لتطبيق ختمة بإرسال الإشعارات إليك؟ نستخدمها لتنبيه الأذان وتذكير ورد القرآن اليومي.':'Allow Khatma to send you notifications? We use them for adhan alerts and your daily Quran reminder.','نعم، أسمح':'Yes, allow','ليس الآن':'Not now','السماح بالموقع':'Allow location','هل تسمح لتطبيق ختمة باستخدام موقعك لتحديد أوقات الصلاة واتجاه القبلة بدقة حسب مكانك؟':'Allow Khatma to use your location to set accurate prayer times and qibla for where you are?','لا، سأختار مدينتي':'No, I will choose my city','جاري تحديد الموقع…':'Locating…','تم تحديد موقعك وأوقات الصلاة.':'Location set. Prayer times updated.','تعذّر تحديد الموقع. يمكنك اختيار مدينتك من تبويب الصلاة.':'Could not get your location. You can choose your city in the Prayer tab.'}); Object.assign(EN, {'أعمال يوم ':'Today\'s deeds - ','زيارة اليوم':'Ziyarat of the day','دعاء اليوم':'Dua of the day','المستحبات:':'Recommended acts:','كل الأيام والزيارات':'All days & ziyarat','صيام يوم الاثنين مستحب':'Fasting on Monday is recommended','صيام يوم الخميس مستحب':'Fasting on Thursday is recommended','ليلة الجمعة: دعاء كميل وزيارة الإمام الحسين (ع)':'Thursday night: Dua Kumayl and ziyarat of Imam Husayn (a)','غسل الجمعة':'Friday ghusl','قراءة سورة الكهف':'Recite Surat al-Kahf','الإكثار من الصلاة على محمد وآل محمد':'Send abundant salawat on Muhammad and his family','دعاء الندبة':'Dua Nudba','زيارة الإمام المهدي (عج)':'Ziyarat of Imam al-Mahdi (aj)'}); Object.assign(EN, { 'دعاء القبور': 'Dua for the graves (Dua al-Qubur)', 'يُقرأ عند زيارة القبور والمقابر': 'Recited when visiting graves and cemeteries', 'زيارة الأموات': 'Ziyarat of the deceased', 'زيارة أهل القبور، تُقرأ عند زيارة المقابر': 'A ziyarat for the people of the graves, recited when visiting cemeteries' });
 Object.assign(EN, {
   'مفعّلة على هذا الجهاز ✓': 'Enabled on this device ✓',
   'غير مفعّلة بعد. ثبّت التطبيق على الشاشة الرئيسية أولاً ثم اضغط الزر.': 'Not enabled yet. Install the app to your Home Screen first, then tap the button.',
