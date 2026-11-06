@@ -39,6 +39,8 @@ h2{margin:0 0 6px;font-size:20px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .chip{padding:9px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;cursor:pointer}
 .chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+input[type=password]{width:100%;padding:11px 11px 11px 46px;border-radius:9px;border:1px solid var(--gsoft);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
+.pw{position:relative}.pw .eye{position:absolute;left:6px;top:12px;width:38px;height:38px;border:0;background:none;font-size:20px;cursor:pointer;padding:0;line-height:1}
 input[type=number],input[type=time],input[type=text]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit;font-size:16px;margin-top:6px}
 .bar{height:12px;background:var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
 .bar>div{height:100%;background:linear-gradient(90deg,var(--gold),var(--pri))}
@@ -1385,6 +1387,8 @@ function findAcct(idRaw) {
   return '';
 }
 function resetProg() { PROG_KEYS.forEach(k => { st[k] = Array.isArray(DEF[k]) ? DEF[k].slice() : DEF[k]; }); st.plan = null; st.streak = 0; }
+function pwField(id, ac) { return '<div class="pw"><input id="' + id + '" type="password" autocomplete="' + ac + '" dir="ltr" maxlength="60"><button type="button" class="eye" data-eye="' + id + '" aria-label="show">👁️</button></div>'; }
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-eye]'); if (!b) return; const i = $(b.dataset.eye); if (!i) return; const sh = i.type === 'password'; i.type = sh ? 'text' : 'password'; b.textContent = sh ? '🙈' : '👁️'; });
 let regMode = 'login';
 function renderReg() {
   const v = $('v-reg'), p = Object.assign({}, st.profile || {}, regDraft || {}); regDraft = null;
@@ -1393,7 +1397,7 @@ function renderReg() {
   if (!regEdit && regMode === 'login') {
     v.innerHTML = head + '<div class="card"><h2>' + tl('تسجيل الدخول') + '</h2>' +
       tl('<label class="mut">البريد الإلكتروني أو رقم الهاتف</label><input id="li" type="text" inputmode="email" autocomplete="username" dir="ltr" maxlength="80">') +
-      tl('<label class="mut">كلمة المرور</label><input id="lp" type="password" autocomplete="current-password" dir="ltr" maxlength="60">') +
+      tl('<label class="mut">كلمة المرور</label>') + pwField('lp', 'current-password') +
       '<p class="note" id="lerr" style="color:#c0392b"></p>' +
       '<button class="btn" id="lgo">' + tl('تسجيل الدخول') + '</button>' +
       tl('<button class="btn ghost" id="lnew">ليس لدي حساب، إنشاء حساب جديد</button><button class="btn ghost" id="lcn">إلغاء</button>') +
@@ -1427,7 +1431,7 @@ function renderReg() {
     tl('<label class="mut">رقم الهاتف (واتساب) *</label><input id="rp" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" placeholder="07701234567">') +
     tl('<label class="mut">البريد الإلكتروني (اختياري)</label><input id="re" type="email" inputmode="email" autocomplete="email" maxlength="80" dir="ltr">') +
     (regEdit && st.acct ? tl('<label class="mut">كلمة مرور جديدة (اتركها فارغة لعدم التغيير)</label>') : regEdit ? tl('<label class="mut">كلمة المرور (لإنشاء حساب للدخول لاحقاً، اختياري)</label>') : tl('<label class="mut">كلمة المرور * (٦ أحرف على الأقل)</label>')) +
-    '<input id="rw" type="password" autocomplete="new-password" dir="ltr" maxlength="60">' +
+    pwField('rw', 'new-password') +
     '<p class="note" id="rerr" style="color:#c0392b"></p>' +
     '<button class="btn" id="rsv">' + (regEdit ? tl('حفظ') : tl('إنشاء الحساب')) + '</button>' +
     (regEdit ? tl('<button class="btn ghost" id="rcn">إلغاء</button>') : tl('<button class="btn ghost" id="rlg">لدي حساب، تسجيل الدخول</button><button class="btn ghost" id="rcn">إلغاء</button>')) + '</div>';
